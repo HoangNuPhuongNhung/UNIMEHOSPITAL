@@ -5,13 +5,13 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PatientCreationDTO {
+
+public class PatientCreateRequest {
     @NotEmpty(message="MISSING_REQUIRED_FIELDS")
     @Size(min = 6, message = "INVALID_USERNAME_FORMAT")
     String patientUsername;

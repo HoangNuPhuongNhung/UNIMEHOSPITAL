@@ -12,39 +12,30 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "patient",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "patient_username"),
-                @UniqueConstraint(columnNames = "patient_email")
-        })
-public class Patient {
+@Table(name = "patient")
+public class Patient{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "patient_id")
-    int patientId;  // Thay đổi từ patient_id sang patientId
+    Integer patientId;
 
-    @Column(name = "patient_username", nullable = false, length = 255)
-    String patientUsername;
-
-    @Column(name = "patient_password", nullable = false, columnDefinition = "TEXT")
-    String patientPassword;  // Thay đổi từ patient_password sang patientPassword
-
-    @Column(name = "patient_email", nullable = false, length = 255)
-    String patientEmail;  // Thay đổi từ patient_email sang patientEmail
+    @OneToOne
+    @JoinColumn(name = "patient_userId", referencedColumnName = "user_id", nullable = false, unique = true)
+    User patientUserId;
 
     @Column(name = "patient_name", nullable = false, length = 255)
-    String patientName;  // Thay đổi từ patient_name sang patientName
+    String patientName;
 
     @Column(name = "patient_address", length = 255)
-    String patientAddress;  // Thay đổi từ patient_address sang patientAddress
+    String patientAddress;
 
     @Column(name = "patient_phonenumber", nullable = false, length = 20)
-    String patientPhoneNumber;  // Thay đổi từ patient_phonenumber sang patientPhoneNumber
+    String patientPhoneNumber;
 
     @Column(name = "patient_gender", nullable = false)
-    boolean patientGender;  // Thay đổi từ patient_gender sang patientGender
+    boolean patientGender;
 
     @Column(name = "patient_date_of_birth")
-    LocalDate patientDateOfBirth;  // Thay đổi từ patient_date_of_birth sang patientDateOfBirth
+    LocalDate patientDateOfBirth;
 }

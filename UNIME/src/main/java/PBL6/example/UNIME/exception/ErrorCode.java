@@ -3,12 +3,17 @@ package PBL6.example.UNIME.exception;
 public enum ErrorCode {
     //
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized Exception"),
-    // Các mã lỗi liên quan đến bệnh nhân
-    PATIENT_EXISTED(1001, "Patient already existed"),
-    PATIENT_NOT_FOUND(1002, "Patient not found"),
-    PATIENT_INVALID(1003, "Invalid patient data"),
 
-    // Các mã lỗi liên quan đến thông tin đăng nhập
+    // lỗi đăng nhập
+    USER_NOT_EXITED(1001, "User Not Exited"),
+    UNAUTHENTICATED(1002, "Unauthenticated"),
+
+    // Các mã lỗi liên quan đến bệnh nhân
+    PATIENT_EXISTED(1101, "Patient already existed"),
+    PATIENT_NOT_FOUND(1102, "Patient not found"),
+    PATIENT_INVALID(1103, "Invalid patient data"),
+
+    // Các mã lỗi liên quan đến thông tin đăng kí
     USERNAME_ALREADY_TAKEN(2001, "Username is already taken"),
     EMAIL_ALREADY_REGISTERED(2002, "Email is already registered"),
 
