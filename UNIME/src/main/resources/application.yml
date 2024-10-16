@@ -14,5 +14,7 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+
+#    open-in-view: false
 jwt:
   signerKey: "4UXF7e8ExKlokbDG0p+/6ICPRLVRVt/GTksOF/+8p5vD+BiPaoKAJJbwmoywIcbv"

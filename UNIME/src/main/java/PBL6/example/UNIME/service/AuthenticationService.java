@@ -4,6 +4,7 @@ package PBL6.example.UNIME.service;
 import PBL6.example.UNIME.dto.request.IntrospectRequest;
 import PBL6.example.UNIME.dto.response.AuthenticationResponse;
 import PBL6.example.UNIME.dto.response.IntrospectResponse;
+import PBL6.example.UNIME.entity.User;
 import PBL6.example.UNIME.exception.AppException;
 import PBL6.example.UNIME.exception.ErrorCode;
 import PBL6.example.UNIME.repository.PatientRepository;
@@ -55,7 +56,7 @@ public class AuthenticationService {
         }
 
         // 3. tạo token
-        var token = generateToken(user.getUsername());
+        var token = generateToken(user);
 
         return AuthenticationResponse.builder()
                 .token(token)
@@ -63,18 +64,18 @@ public class AuthenticationService {
                 .build();
     }
 
-    private String generateToken(String username ) {
+    private String generateToken(User user ) {
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512); // sử dụng thuật toán HMAC với độ dài 512 bit để ký JWS.
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().
-                subject(username).
+                subject(user.getUsername()).
                 issuer("devteria.com").
                 issueTime(new Date()).
                 expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 )).
-                claim("username", username).
+                claim("scope", user.getRole().toString()).
                 build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level =  AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
     UserRepository userRepository;
+    PasswordEncoder passwordEncoder;
 
     public User createUser(User request) {
         if(userRepository.existsByusername(request.getUsername())) {
@@ -28,7 +29,6 @@ public class UserService {
         }
         User user = new User();
         user.setUsername(request.getUsername());
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);    // truyển vào độ mạnh về mã hõa
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         user.setRole(request.getRole());

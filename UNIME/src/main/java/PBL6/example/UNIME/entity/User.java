@@ -29,7 +29,5 @@ public class User {
 
     @Column(name = "user_role", nullable = false, length = 10)
     String role;
-    
-    @OneToOne(mappedBy = "patientUserId")
-    Patient patient;
+
 }
