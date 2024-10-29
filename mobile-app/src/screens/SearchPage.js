@@ -10,6 +10,7 @@ import {
   ImageBackground
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
 
 const doctors = [
   {
@@ -38,10 +39,11 @@ const doctors = [
 const DoctorListPage = () => {
   const [search, setSearch] = useState('');
   const [specialty, setSpecialty] = useState('Tất cả');
+  const navigation = useNavigation();
 
   return (
     <ImageBackground
-      source={require('../../assets/background.png')} 
+      source={require('../../assets/background.png')}
       style={styles.background}
       resizeMode="cover"
     >
@@ -73,7 +75,10 @@ const DoctorListPage = () => {
               <Text style={styles.specialty}>{doctor.specialty}</Text>
               <Text style={styles.hospital}>{doctor.hospital}</Text>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => navigation.navigate('DoctorDetailPage', { doctor })}
+                >
                   <Text style={styles.buttonText}>Xem chi tiết</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button}>
@@ -91,7 +96,6 @@ const DoctorListPage = () => {
     </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

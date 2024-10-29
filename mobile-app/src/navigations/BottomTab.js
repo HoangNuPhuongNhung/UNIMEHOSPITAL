@@ -6,6 +6,7 @@ import SearchPage from '../screens/SearchPage';
 import AppointmentPage from '../screens/AppointmentPage';
 import ProfilePage from '../screens/ProfilePage';
 import { AntDesign } from '@expo/vector-icons';
+import { Header } from '@react-navigation/stack';
 
 const BottomTabNavigator = createBottomTabNavigator();
 
@@ -36,7 +37,10 @@ export default function BottomTab() {
               color={focused ? '#0071ff' : 'gray'}
             />
           ),
-        }}
+          headerShown: false,
+        }
+        
+      }
       />
       <BottomTabNavigator.Screen
         name="Tìm kiếm"
@@ -49,6 +53,7 @@ export default function BottomTab() {
               color={focused ? '#0071ff' : 'gray'}
             />
           ),
+          headerShown: false,
         }}
       />
       <BottomTabNavigator.Screen
@@ -62,6 +67,7 @@ export default function BottomTab() {
               color={focused ? '#0071ff' : 'gray'}
             />
           ),
+          headerShown: false,
         }}
       />
       <BottomTabNavigator.Screen
@@ -75,6 +81,7 @@ export default function BottomTab() {
               color={focused ? '#0071ff' : 'gray'}
             />
           ),
+          headerShown: false,
         }}
       />
     </BottomTabNavigator.Navigator>

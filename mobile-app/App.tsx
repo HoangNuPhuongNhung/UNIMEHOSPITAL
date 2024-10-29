@@ -1,42 +1,40 @@
 // App.js
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-// import { useFonts, Poppins_700Bold, Poppins_400Regular, Poppins_600SemiBold, Poppins_500Medium } from '@expo-google-fonts/poppins';
-// import AppLoading from 'expo-app-loading'; 
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-// import Stack from './src/navigations/Stack';
+import { AuthProvider } from './src/contexts/AuthContext'; 
 import StartPage from './src/screens/StartPage';
 import LoginPage from './src/screens/LoginPage';
 import RegisterPage from './src/screens/RegisterPage';
+import OTPPage from './src/screens/OTPPage';
+import CreatePasswordPage from './src/screens/CreatePasswordPage';
+
+import DoctorDetailPage from './src/screens/DoctorDetailPage';
+import BookDoctorAppointment from './src/screens/BookDoctorAppointment';
+import AppointmentSuccessPage from './src/screens/AppointmentSuccessPage';
+
 import BottomTab from './src/navigations/BottomTab';
-
-
 import { createStackNavigator } from '@react-navigation/stack';
 
-const StackNavigator= createStackNavigator();
+const StackNavigator = createStackNavigator();
 
 export default function App() {
-  // const [fontsLoaded] = useFonts({
-  //   Poppins_400Regular,
-  //   Poppins_600SemiBold,
-  //   Poppins_700Bold,
-  //   Poppins_500Medium,
-  // });
-
-  // if (!fontsLoaded) {
-  //   return <AppLoading />;
-  // }
-
   return (
-    <NavigationContainer>
-      {/* <Stack /> */}
-      <StackNavigator.Navigator initialRouteName="Start">
-        <StackNavigator.Screen name="Start" component={StartPage} options={{ headerShown: false }} />        
-        <StackNavigator.Screen name="Login" component={LoginPage} options={{ headerShown: false }} />
-        <StackNavigator.Screen name="Register" component={RegisterPage} options={{ headerShown: false }} />
-        <StackNavigator.Screen name="bottom tab" component={BottomTab} options={{ headerShown: false }}/>
-      </StackNavigator.Navigator>
-    </NavigationContainer>
+    <AuthProvider> 
+      <NavigationContainer>
+        <StackNavigator.Navigator initialRouteName="bottom Tab">
+          <StackNavigator.Screen name="Start" component={StartPage} options={{ headerShown: false }} />
+          <StackNavigator.Screen name="Login" component={LoginPage} options={{ headerShown: false }} />
+          <StackNavigator.Screen name="Register" component={RegisterPage} options={{ headerShown: false }} />
+          <StackNavigator.Screen name="OTP" component={OTPPage} options={{ headerShown: false }} />
+          <StackNavigator.Screen name="CreatePassword" component={CreatePasswordPage} options={{ headerShown: false }} />
+          <StackNavigator.Screen name="bottom tab" component={BottomTab} options={{ headerShown: false }} />
+          <StackNavigator.Screen name="DoctorDetailPage" component={DoctorDetailPage} options={{ title: 'Danh sách bác sĩ' }} />
+          <StackNavigator.Screen name="book doctor" component={BookDoctorAppointment} options={{ title: 'Thông tin bác sĩ' }} />
+          <StackNavigator.Screen name="appointment success" component={AppointmentSuccessPage} options={{ title: 'Đặt lịch' }} />
+        </StackNavigator.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 

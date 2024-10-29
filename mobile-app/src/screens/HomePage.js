@@ -1,9 +1,7 @@
-import React from 'react';
-import { View, Text, FlatList, ScrollView, StyleSheet, TouchableOpacity, Image ,ImageBackground} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AntDesign } from '@expo/vector-icons';
-
-
 
 const appointments = [
   { id: 1, title: 'Tâm lý', place: 'Phòng khám Saigon', date: '25 Sep', time: '10:30am', icon: 'account' },
@@ -18,12 +16,25 @@ const categories = [
   { name: 'Thận', icon: 'heart-outline' },
   { name: 'Dạ dày', icon: 'heart-outline' },
   { name: 'Phổi', icon: 'heart-outline' },
-  { name: 'Não', icon: 'heart-outline' },
-  { name: 'Tâm thần', icon: 'heart-outline' },
+  { name: 'Nhi Khoa', icon: 'heart-outline' },
+  { name: 'Tai - Mũi - Họng', icon: 'heart-outline' },
   { name: 'Gan', icon: 'heart-outline' },
 ];
 
 const HomePage = () => {
+  const [greeting, setGreeting] = useState('');
+
+  const getGreeting = () => {
+    const currentHour = new Date().getHours();
+    if (currentHour < 12) return 'Chào buổi sáng!';
+    else if (currentHour < 18) return 'Chào buổi chiều!';
+    else return 'Chào buổi tối!';
+  };
+
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
+
   const renderItem = ({ item }) => (
     <View style={styles.appointmentCard}>
       <Icon name={item.icon} size={30} color="#fff" />
@@ -39,34 +50,22 @@ const HomePage = () => {
   );
 
   return (
-    <ImageBackground
-      source={require('../../assets/background.png')} 
-      style={styles.background}
-      resizeMode=""
-    >
+    <ImageBackground source={require('../../assets/background.png')} style={styles.background}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>  
           <View style={styles.welcomeContainer}>
             <Image
               style={styles.logo}
-              source={{
-                uri: 'https://i.pinimg.com/236x/77/b3/a6/77b3a6bda74bd0019cee11780571769c.jpg',
-              }}
+              source={{ uri: 'https://i.pinimg.com/236x/77/b3/a6/77b3a6bda74bd0019cee11780571769c.jpg' }}
             />
             <View style={{ marginLeft: 10 }}>
-              <Text style= {{ fontSize: 20, fontWeight: '600' }}>Nguyen Dac Nhat Hoang</Text>
-              <Text>Good Morning</Text>
+              <Text style={{ fontSize: 20, fontWeight: '600' }}>Nguyen Dac Nhat Hoang</Text>
+              <Text>{greeting}</Text>
             </View>
-            <AntDesign
-              name="bells"
-              size={22}
-              color='#4c9de0'
-              style={styles.bellIcon}
-            />
+            <AntDesign name="bells" size={22} color='#4c9de0' style={styles.bellIcon} />
           </View>
         </View>
 
-        {/*  */}
         <View style={styles.container}>
           <Text style={styles.header}>Lịch hẹn sắp tới</Text>
           <View style={styles.appointmentContainer}>
@@ -80,7 +79,6 @@ const HomePage = () => {
           </View>
         </View>
 
-        {/*  */}
         <View style={styles.container}>
           <Text style={styles.header}>Danh mục</Text>
           <View style={styles.categoryContainer}>
@@ -108,14 +106,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10, 
     margin: 10, 
-    borderRadius: 10,
-    marginBottom: 10,
-    borderRadius: 10,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -133,7 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     position: 'relative',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Thêm màu nền với opacity
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 10,
   },
@@ -151,7 +143,7 @@ const styles = StyleSheet.create({
   },
   appointmentCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(77, 157, 224, 0.9)', // Sử dụng màu nền có opacity
+    backgroundColor: 'rgba(77, 157, 224, 0.9)',
     borderRadius: 10,
     padding: 10,
     marginRight: 10,
@@ -170,7 +162,6 @@ const styles = StyleSheet.create({
   dateContainer: {
     flexDirection: 'row',
     marginTop: 5,
-    
   },
   date: {
     color: '#fff',
@@ -188,16 +179,12 @@ const styles = StyleSheet.create({
   categoryCard: {
     width: '45%',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+    padding: 10,
+    backgroundColor: "#FFF", 
     borderRadius: 10,
     marginBottom: 10,
-    borderRadius: 10,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -208,6 +195,5 @@ const styles = StyleSheet.create({
     color: '#4D9DE0',
   },
 });
-
 
 export default HomePage;

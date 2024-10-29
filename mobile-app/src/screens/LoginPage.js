@@ -1,18 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from 'react-native';
-
+import { AuthContext } from '../contexts/AuthContext'
 const LoginPage = ({ navigation }) => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const { login, loading } = useContext(AuthContext);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  // console.log({ login, loading }); 
 
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/;
     return passwordRegex.test(password);
   };
 
-  const handleLogin = () => {
-    if (!phoneNumber) {
-      Alert.alert('Lỗi', 'Số điện thoại không được để trống!');
+  const handleLogin = async() => {
+    if (!username) {
+      Alert.alert('Lỗi', 'Tên đăng nhập không được để trống!');
+      return;
+    }
+
+    if (username.includes(' ')) {
+      Alert.alert('Lỗi', 'Tên đăng nhập không được chứa dấu cách!');
       return;
     }
 
@@ -21,16 +28,25 @@ const LoginPage = ({ navigation }) => {
       return;
     }
 
-    if (!validatePassword(password)) {
-      Alert.alert(
-        'Lỗi',
-        'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!'
-      );
-      return;
-    }
+    // if (!validatePassword(password)) {
+    //   Alert.alert(
+    //     'Lỗi',
+    //     'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!'
+    //   );
+    //   return;
+    // }
 
-    console.log('Đăng nhập thành công');
-    navigation.navigate('bottom tab'); 
+    // console.log('Đăng nhập thành công');
+    // navigation.navigate('bottom tab'); 
+    try {
+    const isSuccess = await login(username, password); // Gọi hàm login
+    if (isSuccess) {
+      Alert.alert('Thành công', 'Đăng nhập thành công');
+      navigation.navigate('bottom tab'); // Điều hướng
+    }
+    } catch (error) {
+      Alert.alert('Lỗi', 'Tên đăng nhập hoặc mật khẩu không chính xác!'); 
+    }
   };
 
   return (
@@ -43,11 +59,10 @@ const LoginPage = ({ navigation }) => {
         <Text style={styles.headerText}>Đăng nhập</Text>
         <TextInput
           style={styles.input}
-          placeholder="Số điện thoại"
-          keyboardType="phone-pad"
+          placeholder="Tên đăng nhập"
           placeholderTextColor="#888"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
+          value={username}
+          onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
@@ -70,7 +85,6 @@ const LoginPage = ({ navigation }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

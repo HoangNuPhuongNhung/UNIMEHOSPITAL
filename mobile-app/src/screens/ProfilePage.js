@@ -1,20 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AuthContext } from '../contexts/AuthContext';
 
-const ProfilePage = () => {
+const ProfilePage = ({ navigation }) => {
+  const { logout } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Đăng xuất",
+      "Bạn có chắc chắn muốn đăng xuất?",
+      [
+        {
+          text: "Hủy",
+          style: "cancel"
+        },
+        { text: "Đồng ý", onPress: () => {
+            logout();
+            navigation.replace("Login"); // Điều hướng về trang đăng nhập
+          }
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <ImageBackground
       source={require('../../assets/background.png')} 
       style={styles.background}
-      resizeMode=""
+      resizeMode="cover"
     >
       <View style={styles.container}>
         <View style={styles.profileContainer}>
           <Image
             style={styles.avatar}
             source={{
-              uri: 'https://i.pinimg.com/236x/77/b3/a6/77b3a6bda74bd0019cee11780571769c.jpg', // Ảnh đại diện
+              uri: 'https://i.pinimg.com/236x/77/b3/a6/77b3a6bda74bd0019cee11780571769c.jpg',
             }}
           />
           <View style={styles.info}>
@@ -34,7 +56,7 @@ const ProfilePage = () => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Đổi mật khẩu</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleLogout}>
           <Text style={styles.buttonText}>Đăng xuất</Text>
         </TouchableOpacity>
       </View>
