@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AntDesign } from '@expo/vector-icons';
+// import { Path, SvgUri } from "react-native-svg";
+// import Svg, { Circle } from 'react-native-svg';
+import { Path, Svg, Circle } from "react-native-svg";
 
 const appointments = [
   { id: 1, title: 'Tâm lý', place: 'Phòng khám Saigon', date: '25 Sep', time: '10:30am', icon: 'account' },
@@ -17,8 +20,6 @@ const categories = [
   { name: 'Dạ dày', icon: 'heart-outline' },
   { name: 'Phổi', icon: 'heart-outline' },
   { name: 'Nhi Khoa', icon: 'heart-outline' },
-  { name: 'Tai - Mũi - Họng', icon: 'heart-outline' },
-  { name: 'Gan', icon: 'heart-outline' },
 ];
 
 const HomePage = () => {
@@ -56,15 +57,30 @@ const HomePage = () => {
           <View style={styles.welcomeContainer}>
             <Image
               style={styles.logo}
-              source={{ uri: 'https://i.pinimg.com/236x/77/b3/a6/77b3a6bda74bd0019cee11780571769c.jpg' }}
+              source={{ uri: 'https://i.pinimg.com/236x/60/63/31/60633133bbaa2c23ba12f41e7aacfc54.jpg' }}
             />
             <View style={{ marginLeft: 10 }}>
               <Text style={{ fontSize: 20, fontWeight: '600' }}>Nguyen Dac Nhat Hoang</Text>
-              <Text>{greeting}</Text>
+              <Text>{greeting} </Text>
             </View>
             <AntDesign name="bells" size={22} color='#4c9de0' style={styles.bellIcon} />
+            {/* <View style={styles.bellIcon}>
+              <Svg viewBox="0 0 24 24" >
+                  <Path
+                    d="M18.7491 9.70957V9.00497C18.7491 5.13623 15.7274 2 12 2C8.27256 2 5.25087 5.13623 5.25087 9.00497V9.70957C5.25087 10.5552 5.00972 11.3818 4.5578 12.0854L3.45036 13.8095C2.43882 15.3843 3.21105 17.5249 4.97036 18.0229C9.57274 19.3257 14.4273 19.3257 19.0296 18.0229C20.789 17.5249 21.5612 15.3843 20.5496 13.8095L19.4422 12.0854C18.9903 11.3818 18.7491 10.5552 18.7491 9.70957Z"
+                    stroke="#2b6fce"
+                    strokeWidth=".5"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+              </Svg>
+            </View> */}
+            
+            
           </View>
         </View>
+        
 
         <View style={styles.container}>
           <Text style={styles.header}>Lịch hẹn sắp tới</Text>
@@ -125,7 +141,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     position: 'relative',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    // backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 10,
   },
@@ -135,8 +151,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   bellIcon: {
-    position: 'absolute',
-    right: 15,
+    marginRight: 0, 
+    alignSelf: 'center', 
   },
   appointmentContainer: {
     marginBottom: 20,

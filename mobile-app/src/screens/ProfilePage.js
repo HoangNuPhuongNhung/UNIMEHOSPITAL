@@ -2,9 +2,11 @@ import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AuthContext } from '../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
-const ProfilePage = ({ navigation }) => {
+const ProfilePage = ({ route }) => {
   const { logout } = useContext(AuthContext);
+  const navigation = useNavigation();
 
   const handleLogout = () => {
     Alert.alert(
@@ -17,7 +19,7 @@ const ProfilePage = ({ navigation }) => {
         },
         { text: "Đồng ý", onPress: () => {
             logout();
-            navigation.replace("Login"); // Điều hướng về trang đăng nhập
+            navigation.replace("Login"); 
           }
         }
       ],
@@ -36,7 +38,7 @@ const ProfilePage = ({ navigation }) => {
           <Image
             style={styles.avatar}
             source={{
-              uri: 'https://i.pinimg.com/236x/77/b3/a6/77b3a6bda74bd0019cee11780571769c.jpg',
+              uri: 'https://i.pinimg.com/236x/60/63/31/60633133bbaa2c23ba12f41e7aacfc54.jpg',
             }}
           />
           <View style={styles.info}>
@@ -53,7 +55,10 @@ const ProfilePage = ({ navigation }) => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Cài đặt tài khoản</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={() => navigation.navigate('change password')}
+        >
           <Text style={styles.buttonText}>Đổi mật khẩu</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleLogout}>

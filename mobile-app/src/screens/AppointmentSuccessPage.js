@@ -3,40 +3,41 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-const AppointmentSuccessScreen = () => {
+const AppointmentSuccessPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Dữ liệu truyền từ trang trước qua route.params
-  const { doctorName, specialty, date, time, location, service, price, note } = route.params;
+  const { doctor, date, time, service, price, note } = route.params;
 
   return (
     <View style={styles.container}>
-      {/* Icon xác nhận */}
+
       <View style={styles.iconContainer}>
         <Icon name="check-circle" size={80} color="#4D9DE0" />
       </View>
 
-      {/* Tiêu đề */}
       <Text style={styles.title}>ĐẶT LỊCH KHÁM THÀNH CÔNG</Text>
 
-      {/* Thông tin chi tiết */}
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Icon name="person" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>{doctorName}</Text>
-          <Text style={styles.subInfoText}>Chuyên khoa: {specialty}</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">{doctor.name}</Text>
+            <Text style={styles.subInfoText}>Chuyên khoa: {doctor.specitalty}</Text>
+          </View>
         </View>
 
         <View style={styles.infoRow}>
           <Icon name="calendar-today" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>{date}</Text>
-          <Text style={styles.subInfoText}>Thời gian: {time}</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.infoText}>{date}</Text>
+            <Text style={styles.subInfoText}>Thời gian: {time}</Text>
+          </View>
         </View>
 
         <View style={styles.infoRow}>
           <Icon name="location-on" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>{location}</Text>
+          <Text style={styles.infoText}>Địa chỉ: {doctor.address}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -55,8 +56,7 @@ const AppointmentSuccessScreen = () => {
         </View>
       </View>
 
-      {/* Nút quay về trang chủ */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('bottom tab')}>
         <Text style={styles.buttonText}>Quay về trang chủ</Text>
       </TouchableOpacity>
     </View>
@@ -95,19 +95,22 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start', 
     marginBottom: 10,
+  },
+  textContainer: {
+    flex: 1, 
+    marginLeft: 10,
   },
   infoText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-    marginLeft: 10,
   },
   subInfoText: {
     fontSize: 14,
     color: '#777',
-    marginLeft: 34, // Dịch xa hơn để tạo khoảng cách cho sub info
+    marginTop: 2, 
   },
   button: {
     backgroundColor: '#4D9DE0',
@@ -122,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AppointmentSuccessScreen;
+export default AppointmentSuccessPage;

@@ -1,22 +1,26 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
 const DoctorDetailPage = ({ route }) => {
-
-  const { doctor } = route.params;
+  const { doctor } = route.params; // Lấy dữ liệu bác sĩ từ route params
   const navigation = useNavigation();
 
   return (
     <ScrollView style={styles.container}>
-
-
-      <Image source={{ uri: doctor.image }} style={styles.profileImage} />
+      {/* Hiển thị hình ảnh bác sĩ */}
+      <Image source={{ uri: doctor.avatar }} style={styles.profileImage} />
+      {/* Hiển thị tên bác sĩ */}
       <Text style={styles.name}>{doctor.name}</Text>
-      <Text style={styles.specialty}>Chuyên khoa: {doctor.specialty}</Text>
-      <Text style={styles.hospital}>Bệnh viện: {doctor.hospital}</Text>
+      {/* Hiển thị chuyên khoa */}
+      <Text style={styles.specialty}>Chuyên khoa: {doctor.specitalty}</Text>
+      {/* Hiển thị địa chỉ */}
+      <Text style={styles.address}>Địa chỉ: {doctor.address}</Text>
+      {/* Hiển thị thông tin chi tiết */}
+      <Text style={styles.info}>Thông tin: {doctor.info}</Text>
 
+      {/* Nút để đặt lịch khám */}
       <TouchableOpacity
         style={styles.bookButton}
         onPress={() => navigation.navigate('book doctor', { doctor })}
@@ -61,11 +65,18 @@ const styles = StyleSheet.create({
     color: '#666',
     marginVertical: 8,
   },
-  hospital: {
+  address: {
     fontSize: 16,
     textAlign: 'center',
     color: '#666',
-    marginBottom: 16,
+    marginVertical: 8,
+  },
+  info: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#666',
+    marginVertical: 8,
+    paddingHorizontal: 10,
   },
   bookButton: {
     backgroundColor: '#4D9DE0',

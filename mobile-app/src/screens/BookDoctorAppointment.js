@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
 
-const BookDoctorAppointment = () => {
+
+const BookDoctorAppointment = ({ route }) => {
+  const { doctor } = route.params;
+  const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState(null);
   const [service, setService] = useState("Khám bệnh");
@@ -15,15 +19,36 @@ const BookDoctorAppointment = () => {
   ];
 
   const confirmAppointment = () => {
-    // navigation.navigate('book doctor', { doctor })
+    navigation.navigate('appointment success', { 
+      doctor, 
+      date: selectedDate, 
+      time: selectedTime, 
+      service, 
+      price: getServicePrice(service), 
+      note 
+    });
     console.log('Bookdoctor');
-  }
+  };
+
+  const getServicePrice = (service) => {
+    switch (service) {
+      case 'Khám bệnh':
+        return '500,000 đ';
+      case 'Tư vấn':
+        return '200,000 đ';
+      default:
+        return '0 đ';
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
+      <Image source={{ uri: doctor.avatar }} style={styles.profileImage} />
+      <Text style={styles.name}>{doctor.name}</Text>
+      <Text style={styles.specialty}>Chuyên khoa: {doctor.specitalty}</Text>
+      <Text style={styles.address}>Địa chỉ: {doctor.address}</Text>
       <Text style={styles.title}>Đặt lịch khám</Text>
 
-      {/* Lịch chọn ngày */}
       <Text style={styles.sectionTitle}>Chọn ngày khám</Text>
       <Calendar
         onDayPress={(day) => setSelectedDate(day.dateString)}
@@ -37,7 +62,6 @@ const BookDoctorAppointment = () => {
         }}
       />
 
-      {/* Chọn giờ khám */}
       <Text style={styles.sectionTitle}>Chọn giờ khám</Text>
       <View style={styles.timeSlotsContainer}>
         {timeSlots.map((time, index) => (
@@ -57,7 +81,6 @@ const BookDoctorAppointment = () => {
         ))}
       </View>
 
-      {/* Chọn dịch vụ */}
       <Text style={styles.sectionTitle}>Chọn dịch vụ</Text>
       <Picker
         selectedValue={service}
@@ -68,11 +91,9 @@ const BookDoctorAppointment = () => {
         <Picker.Item label="Tư vấn" value="Tư vấn" />
       </Picker>
 
-      {/* Giá tiền */}
       <Text style={styles.priceLabel}>Giá tiền:</Text>
-      <Text style={styles.price}>500,000 đ</Text>
+      <Text style={styles.price}>{getServicePrice(service)}</Text>
 
-      {/* Ghi chú */}
       <Text style={styles.sectionTitle}>Ghi chú</Text>
       <TextInput
         style={styles.noteInput}
@@ -82,10 +103,10 @@ const BookDoctorAppointment = () => {
         onChangeText={setNote}
       />
 
-      {/* Nút Đặt lịch khám */}
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={confirmAppointment}
+        onPress={selectedDate && selectedTime ? confirmAppointment : null} 
+        disabled={!selectedDate || !selectedTime} 
       >
         <Text style={styles.bookButtonText}>Đặt lịch khám</Text>
       </TouchableOpacity>
@@ -98,6 +119,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#EAF1FF',
     padding: 20,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  specialty: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#666',
+    marginVertical: 8,
+  },
+  address: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#666',
+    marginVertical: 8,
   },
   title: {
     fontSize: 24,

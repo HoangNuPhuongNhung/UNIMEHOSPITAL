@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,39 +7,35 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  ImageBackground
+  ImageBackground,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
-
-const doctors = [
-  {
-    id: 1,
-    name: 'Tiến sĩ, Bác sĩ Lân Việt Trung',
-    specialty: 'Tiêu hóa',
-    hospital: 'Bệnh viện Chợ Rẫy, Hồ Chí Minh',
-    image: 'https://i.pinimg.com/236x/be/c0/94/bec094704eb85e0f76073a064dbdb9c7.jpg',
-  },
-  {
-    id: 2,
-    name: 'Tiến sĩ, Bác sĩ Nguyễn Lân Việt',
-    specialty: 'Tim mạch',
-    hospital: 'Bệnh viện Bạch Mai, Hà Nội',
-    image: 'https://i.pinimg.com/236x/be/c0/94/bec094704eb85e0f76073a064dbdb9c7.jpg',
-  },
-  {
-    id: 3,
-    name: 'Bác sĩ Chuyên khoa 2 Lê Minh Hoàng',
-    specialty: 'Nội tiết',
-    hospital: 'Bệnh viện Nhân Dân 2, Hồ Chí Minh',
-    image: 'https://i.pinimg.com/236x/be/c0/94/bec094704eb85e0f76073a064dbdb9c7.jpg',
-  },
-];
+import axios from 'axios';
 
 const DoctorListPage = () => {
   const [search, setSearch] = useState('');
-  const [specialty, setSpecialty] = useState('Tất cả');
+  const [doctors, setDoctors] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(5); 
   const navigation = useNavigation();
+
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get('https://6720cd2f98bbb4d93ca61a67.mockapi.io/api/v1/doctors');
+      setDoctors(response.data); 
+    } catch (error) {
+      console.error(error); 
+    }
+  };
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const loadMoreDoctors = () => {
+    setCurrentIndex((prevIndex) => prevIndex + 5); 
+  };
 
   return (
     <ImageBackground
@@ -51,7 +47,7 @@ const DoctorListPage = () => {
         <View style={styles.filterContainer}>
           <Text style={styles.label}>Chuyên khoa</Text>
           <View style={styles.dropdown}>
-            <Text>{specialty}</Text>
+            <Text>Tất cả</Text>
             <Icon name="arrow-drop-down" size={24} color="#333" />
           </View>
         </View>
@@ -67,13 +63,13 @@ const DoctorListPage = () => {
           <Icon name="search" size={24} color="#333" style={styles.searchIcon} />
         </View>
 
-        {doctors.map((doctor) => (
+        {doctors.slice(0, currentIndex).map((doctor) => (
           <View key={doctor.id} style={styles.card}>
-            <Image source={{ uri: doctor.image }} style={styles.doctorImage} />
+            <Image source={{ uri: doctor.avatar }} style={styles.doctorImage} />
             <View style={styles.infoContainer}>
               <Text style={styles.doctorName}>{doctor.name}</Text>
-              <Text style={styles.specialty}>{doctor.specialty}</Text>
-              <Text style={styles.hospital}>{doctor.hospital}</Text>
+              <Text style={styles.specialty}>{doctor.specitalty}</Text>
+              <Text style={styles.hospital}>{doctor.address}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={styles.button}
@@ -81,7 +77,10 @@ const DoctorListPage = () => {
                 >
                   <Text style={styles.buttonText}>Xem chi tiết</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => navigation.navigate('book doctor', { doctor })}
+                >
                   <Text style={styles.buttonText}>Đặt khám</Text>
                 </TouchableOpacity>
               </View>
@@ -89,13 +88,16 @@ const DoctorListPage = () => {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.loadMoreButton}>
-          <Text style={styles.loadMoreText}>Xem thêm</Text>
-        </TouchableOpacity>
+        {currentIndex < doctors.length && (
+          <TouchableOpacity style={styles.loadMoreButton} onPress={loadMoreDoctors}>
+            <Text style={styles.loadMoreText}>Xem thêm</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </ImageBackground>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Thêm opacity cho dropdown
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     padding: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Thêm opacity cho input
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Thêm opacity cho card
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,

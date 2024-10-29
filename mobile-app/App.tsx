@@ -9,6 +9,8 @@ import RegisterPage from './src/screens/RegisterPage';
 import OTPPage from './src/screens/OTPPage';
 import CreatePasswordPage from './src/screens/CreatePasswordPage';
 
+import ChangePasswordPage from './src/screens/ChangePasswordPage';
+
 import DoctorDetailPage from './src/screens/DoctorDetailPage';
 import BookDoctorAppointment from './src/screens/BookDoctorAppointment';
 import AppointmentSuccessPage from './src/screens/AppointmentSuccessPage';
@@ -29,6 +31,7 @@ export default function App() {
           <StackNavigator.Screen name="OTP" component={OTPPage} options={{ headerShown: false }} />
           <StackNavigator.Screen name="CreatePassword" component={CreatePasswordPage} options={{ headerShown: false }} />
           <StackNavigator.Screen name="bottom tab" component={BottomTab} options={{ headerShown: false }} />
+          <StackNavigator.Screen name="change password" component={ChangePasswordPage} options={{ title: 'Hồ sơ' }} />
           <StackNavigator.Screen name="DoctorDetailPage" component={DoctorDetailPage} options={{ title: 'Danh sách bác sĩ' }} />
           <StackNavigator.Screen name="book doctor" component={BookDoctorAppointment} options={{ title: 'Thông tin bác sĩ' }} />
           <StackNavigator.Screen name="appointment success" component={AppointmentSuccessPage} options={{ title: 'Đặt lịch' }} />
