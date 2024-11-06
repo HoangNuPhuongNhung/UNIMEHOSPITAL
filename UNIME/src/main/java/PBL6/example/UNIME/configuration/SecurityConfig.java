@@ -59,7 +59,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081")); // Thay thế bằng URL frontend của bạn
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081", "https://unimehospital.vercel.app/")); // Thay thế bằng URL frontend của bạn
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
