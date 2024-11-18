@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
-
+import { Ionicons } from '@expo/vector-icons';
 const RegisterPage = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
 
@@ -19,6 +19,14 @@ const RegisterPage = ({ navigation }) => {
         style={styles.background}
         resizeMode="cover"
       >
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#2046A9" />
+        </TouchableOpacity>
+
+        
         <Text style={styles.headerText}>Đăng ký</Text>
         <TextInput
           style={styles.input}
@@ -84,6 +92,12 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#FFF',
     fontSize: 16,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    padding: 10,
   },
 });
 
