@@ -1,46 +1,70 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 
 const OTPPage = ({ route, navigation }) => {
-    const { phoneNumber } = route.params;
-    const [otp, setOtp] = useState(['', '', '', '']); 
-    const otpRefs = useRef([]);
+  const { email, otp } = route.params; // Lấy email và mã OTP từ RegisterPage
+  const [userInputOtp, setUserInputOtp] = useState(['', '', '', '']); // Khởi tạo userInputOtp
+  const otpRefs = useRef([]);
+  const [isResending, setIsResending] = useState(false);
 
-    const handleChange = (text, index) => {
-    const newOtp = [...otp];
+  const handleChange = (text, index) => {
+    const newOtp = [...userInputOtp];
     newOtp[index] = text;
-    setOtp(newOtp);
+    setUserInputOtp(newOtp);
 
     if (text && index < 3) {
-      otpRefs.current[index + 1].focus();
+      otpRefs.current[index + 1].focus(); // Chuyển đến ô tiếp theo
     }
-    };
+  };
 
-     const handleKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace' && otp[index] === '' && index > 0) {
-      otpRefs.current[index - 1].focus();
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace' && userInputOtp[index] === '' && index > 0) {
+      otpRefs.current[index - 1].focus(); // Quay lại ô trước nếu người dùng xóa
     }
-    };
+  };
 
-    const handleSubmit = () => {
-    console.log("OTP:", otp.join('')); 
-    navigation.navigate('CreatePassword'); 
-    };
+  // const handleResendOtp = async () => {
+  //   setIsResending(true);
+  //   try {
+  //     const response = await axios.post('https://api.unime.site/UNIME/sendOtp', { email });
+  //     if (response.data.code === 1000) {
+  //       setOtp(response.data.result); // Cập nhật mã OTP mới
+  //       Alert.alert('Thành công', 'OTP mới đã được gửi đến email của bạn.');
+  //     } else {
+  //       Alert.alert('Lỗi', 'Không thể gửi lại OTP. Vui lòng thử lại sau.');
+  //     }
+  //   } catch (error) {
+  //     Alert.alert('Lỗi', 'Đã xảy ra lỗi khi gửi lại OTP.');
+  //   } finally {
+  //     setIsResending(false);
+  //   }
+  // };
 
-    return (
+  const handleSubmit = () => {
+    const enteredOtp = userInputOtp.join(''); // Ghép các ký tự lại thành chuỗi
+    if (enteredOtp === otp) {
+      navigation.navigate('CreatePassword'); // Chuyển hướng nếu OTP đúng
+    } else {
+      alert('Mã OTP không đúng. Vui lòng kiểm tra lại!');
+    }
+  };
+
+  return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../../assets/background.png')} 
+        source={require('../../assets/background.png')}
         style={styles.background}
         resizeMode="cover"
       >
         <Text style={styles.headerText}>Xác thực OTP</Text>
-        <Text style={styles.instructionText}>Nhập mã xác thực đã được gửi đến số {phoneNumber}</Text>
+        <Text style={styles.instructionText}>
+          Nhập mã xác thực đã được gửi đến email {email}
+        </Text>
         <View style={styles.otpContainer}>
-          {otp.map((value, index) => (
+          {userInputOtp.map((value, index) => (
             <TextInput
               key={index}
-              ref={(ref) => otpRefs.current[index] = ref}
+              ref={(ref) => (otpRefs.current[index] = ref)}
               style={styles.otpInput}
               value={value}
               onChangeText={(text) => handleChange(text, index)}
@@ -50,9 +74,15 @@ const OTPPage = ({ route, navigation }) => {
             />
           ))}
         </View>
-        <TouchableOpacity style={styles.resendOtpButton}>
-          <Text style={styles.linkText}>Không nhận được OTP? Gửi lại</Text>
-        </TouchableOpacity>
+        {/* <TouchableOpacity
+          style={styles.resendOtpButton}
+          onPress={handleResendOtp}
+          disabled={isResending} // Vô hiệu hóa khi đang gửi lại
+        >
+          <Text style={styles.linkText}>
+            {isResending ? 'Đang gửi lại OTP...' : 'Không nhận được OTP? Gửi lại'}
+          </Text>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.confirmButton} onPress={handleSubmit}>
           <Text style={styles.confirmButtonText}>Xác nhận</Text>
         </TouchableOpacity>
@@ -60,7 +90,6 @@ const OTPPage = ({ route, navigation }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -74,9 +103,9 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 65,
     color: '#FFF',
   },
   instructionText: {
@@ -102,13 +131,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     backgroundColor: '#FFF',
     color: '#000',
-  },
-  resendOtpButton: {
-    marginBottom: 30,
-  },
-  linkText: {
-    color: '#000000',
-    fontSize: 16,
   },
   confirmButton: {
     backgroundColor: '#1E90FF',

@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#1E90FF',
     marginTop: 10,
     textAlign: 'center',
     paddingHorizontal: 40,

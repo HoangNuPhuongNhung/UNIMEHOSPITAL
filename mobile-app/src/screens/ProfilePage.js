@@ -1,12 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState,useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-
+import { getUserInfo } from '../services/authService';
 const ProfilePage = ({ route }) => {
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
+  const [userInfo, setUserInfo] = useState(null);
 
   const handleLogout = () => {
     Alert.alert(
@@ -26,6 +27,19 @@ const ProfilePage = ({ route }) => {
       { cancelable: true }
     );
   };
+  const fetchUserInfo = async () => {
+    try {
+      const data = await getUserInfo(); // Lấy thông tin user từ API
+      setUserInfo(data); // Lưu thông tin user vào state
+      console.log(data);
+    } catch (error) {
+      console.error('Lỗi lấy thông tin user:', error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
 
   return (
     <ImageBackground
@@ -38,13 +52,13 @@ const ProfilePage = ({ route }) => {
           <Image
             style={styles.avatar}
             source={{
-              uri: 'https://i.pinimg.com/236x/60/63/31/60633133bbaa2c23ba12f41e7aacfc54.jpg',
+              uri: userInfo?.patientImage
             }}
           />
           <View style={styles.info}>
-            <Text style={styles.name}>Hoang</Text>
-            <Text style={styles.detail}>03.02.2003</Text>
-            <Text style={styles.detail}>+123456789</Text>
+            <Text style={styles.name}>{userInfo?.patientName}</Text>
+            <Text style={styles.detail}>{userInfo?.patientDateOfBirth}</Text>
+            <Text style={styles.detail}>{userInfo?.patientPhoneNumber}</Text>
           </View>
           <Icon name="pencil" size={24} color="#4D9DE0" style={styles.editIcon} />
         </View>

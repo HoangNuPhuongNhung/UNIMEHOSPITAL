@@ -5,7 +5,7 @@ import { AntDesign } from '@expo/vector-icons';
 // import { Path, SvgUri } from "react-native-svg";
 // import Svg, { Circle } from 'react-native-svg';
 import { Path, Svg, Circle } from "react-native-svg";
-
+import { getUserInfo } from '../services/authService';
 const appointments = [
   { id: 1, title: 'Tâm lý', place: 'Phòng khám Saigon', date: '25 Sep', time: '10:30am', icon: 'account' },
   { id: 2, title: 'Tiêu hóa', place: 'Bệnh viện chợ rẫy', date: '26 Sep', time: '10:30am', icon: 'account' },
@@ -14,16 +14,18 @@ const appointments = [
 ];
 
 const categories = [
-  { name: 'Tim', icon: 'heart-outline' },
-  { name: 'Nha khoa', icon: 'heart-outline' },
-  { name: 'Thận', icon: 'heart-outline' },
-  { name: 'Dạ dày', icon: 'heart-outline' },
-  { name: 'Phổi', icon: 'heart-outline' },
-  { name: 'Nhi Khoa', icon: 'heart-outline' },
+  { name: 'Tim', icon: require('../../assets/specialty/heart.png') },
+  { name: 'Nha khoa', icon: require('../../assets/specialty/tooth.png') },
+  { name: 'Thận', icon: require('../../assets/specialty/kidney.png') },
+  { name: 'Dạ dày', icon: require('../../assets/specialty/stomach.png') },
+  { name: 'Phổi', icon: require('../../assets/specialty/lungs.png') },
+  { name: 'Nhi Khoa', icon: require('../../assets/specialty/child.png') },
 ];
+
 
 const HomePage = () => {
   const [greeting, setGreeting] = useState('');
+  const [userInfo, setUserInfo] = useState(null);
 
   const getGreeting = () => {
     const currentHour = new Date().getHours();
@@ -32,8 +34,19 @@ const HomePage = () => {
     else return 'Chào buổi tối!';
   };
 
+  const fetchUserInfo = async () => {
+    try {
+      const data = await getUserInfo(); // Lấy thông tin user từ API
+      setUserInfo(data); // Lưu thông tin user vào state
+      console.log(data);
+    } catch (error) {
+      console.error('Lỗi lấy thông tin user:', error.message);
+    }
+  };
+
   useEffect(() => {
     setGreeting(getGreeting());
+    fetchUserInfo();
   }, []);
 
   const renderItem = ({ item }) => (
@@ -53,14 +66,14 @@ const HomePage = () => {
   return (
     <ImageBackground source={require('../../assets/background.png')} style={styles.background}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>  
+        <View style={styles.container}>
           <View style={styles.welcomeContainer}>
             <Image
               style={styles.logo}
-              source={{ uri: 'https://i.pinimg.com/236x/60/63/31/60633133bbaa2c23ba12f41e7aacfc54.jpg' }}
+              source={{ uri: userInfo?.patientImage }}
             />
             <View style={{ marginLeft: 10 }}>
-              <Text style={{ fontSize: 20, fontWeight: '600' }}>Nguyen Dac Nhat Hoang</Text>
+              <Text style={{ fontSize: 20, fontWeight: '600' }}>{userInfo?.patientName}</Text>
               <Text>{greeting} </Text>
             </View>
             <AntDesign name="bells" size={22} color='#4c9de0' style={styles.bellIcon} />
@@ -76,11 +89,11 @@ const HomePage = () => {
                   />
               </Svg>
             </View> */}
-            
-            
+
+
           </View>
         </View>
-        
+
 
         <View style={styles.container}>
           <Text style={styles.header}>Lịch hẹn sắp tới</Text>
@@ -98,9 +111,9 @@ const HomePage = () => {
         <View style={styles.container}>
           <Text style={styles.header}>Danh mục</Text>
           <View style={styles.categoryContainer}>
-            {categories.map(category => (
+            {categories.map((category) => (
               <TouchableOpacity key={category.name} style={styles.categoryCard}>
-                <Icon name={category.icon} size={30} color="#4D9DE0" />
+                <Image source={category.icon} style={{ width: 30, height: 30 }} />
                 <Text style={styles.categoryText}>{category.name}</Text>
               </TouchableOpacity>
             ))}
@@ -114,14 +127,14 @@ const HomePage = () => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover', 
+    resizeMode: 'cover',
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(244, 246, 252, 0.9)', 
+    backgroundColor: 'rgba(244, 246, 252, 0.9)',
     padding: 20,
-    borderRadius: 10, 
-    margin: 10, 
+    borderRadius: 10,
+    margin: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -135,7 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333', 
+    color: '#333',
   },
   welcomeContainer: {
     flexDirection: 'row',
@@ -151,8 +164,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   bellIcon: {
-    marginRight: 0, 
-    alignSelf: 'center', 
+    marginRight: 0,
+    alignSelf: 'center',
   },
   appointmentContainer: {
     marginBottom: 20,
@@ -196,7 +209,7 @@ const styles = StyleSheet.create({
     width: '45%',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: "#FFF", 
+    backgroundColor: "#FFF",
     borderRadius: 10,
     marginBottom: 10,
     shadowColor: "#000",

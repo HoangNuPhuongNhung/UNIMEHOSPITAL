@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { sendOtp } from '../services/otpService';
 const RegisterPage = ({ navigation }) => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
 
-  const handleSendOTP = () => {
-    if (phoneNumber.trim() !== '') {
-      navigation.navigate('OTP', { phoneNumber }); 
+  const handleSendOTP = async () => {
+    if (email.trim() !== '') {
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { // Kiểm tra định dạng email
+        try {
+          const data = await sendOtp(email); // Gọi API từ otpService.js
+          if (data.code === 1000) {
+            navigation.navigate('OTP', { email, otp: data.result }); // Chuyển sang OTPPage
+          } else {
+            alert('Gửi OTP thất bại. Vui lòng thử lại!');
+          }
+        } catch (error) {
+          alert('Có lỗi xảy ra khi gửi OTP. Vui lòng kiểm tra lại!');
+        }
+      } else {
+        alert('Vui lòng nhập đúng định dạng email!');
+      }
     } else {
-      alert("Vui lòng nhập số điện thoại!");
+      alert('Vui lòng nhập email!');
     }
   };
 
@@ -26,15 +40,15 @@ const RegisterPage = ({ navigation }) => {
           <Ionicons name="arrow-back" size={24} color="#2046A9" />
         </TouchableOpacity>
 
-        
         <Text style={styles.headerText}>Đăng ký</Text>
         <TextInput
           style={styles.input}
-          placeholder="Số điện thoại"
-          keyboardType="phone-pad"
+          placeholder="Email"
+          keyboardType="email-address" 
           placeholderTextColor="#888"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber} 
+          value={email}
+          onChangeText={setEmail} 
+          autoCapitalize="none" // Tắt viết hoa tự động
         />
         <TouchableOpacity style={styles.sendOtpButton} onPress={handleSendOTP}>
           <Text style={styles.sendOtpButtonText}>Gửi OTP</Text>
@@ -43,7 +57,6 @@ const RegisterPage = ({ navigation }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -85,13 +98,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  loginLink: {
-    marginTop: 30,
-  },
-  linkText: {
-    color: '#FFF',
-    fontSize: 16,
   },
   backButton: {
     position: 'absolute',

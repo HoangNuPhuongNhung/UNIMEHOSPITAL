@@ -45,7 +45,7 @@ const LoginPage = ({ navigation }) => {
       navigation.navigate('bottom tab'); // Điều hướng
     }
     } catch (error) {
-      Alert.alert('Lỗi', 'Tên đăng nhập hoặc mật khẩu không chính xác!'); 
+      Alert.alert('Lỗi', error.message || 'Tên đăng nhập hoặc mật khẩu không chính xác!');
     }
   };
 
