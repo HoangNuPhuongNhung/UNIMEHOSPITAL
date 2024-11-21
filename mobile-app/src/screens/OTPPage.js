@@ -43,7 +43,7 @@ const OTPPage = ({ route, navigation }) => {
   const handleSubmit = () => {
     const enteredOtp = userInputOtp.join(''); // Ghép các ký tự lại thành chuỗi
     if (enteredOtp === otp) {
-      navigation.navigate('CreatePassword'); // Chuyển hướng nếu OTP đúng
+      navigation.navigate('CreatePassword', { email: route.params.email });
     } else {
       alert('Mã OTP không đúng. Vui lòng kiểm tra lại!');
     }
