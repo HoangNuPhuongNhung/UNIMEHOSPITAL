@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert, Platform, Modal } from 'react-native';
 import axios from 'axios';
 import RadioGroup from 'react-native-radio-buttons-group';
+import DateTimePicker from '@react-native-community/datetimepicker';
 const CreatePasswordPage = ({ route, navigation }) => {
   const email = route.params?.email || '';
   console.log(email);
@@ -14,6 +15,8 @@ const CreatePasswordPage = ({ route, navigation }) => {
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [gender, setGender] = useState(true);
   const [selectedId, setSelectedId] = useState('1');
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
   console.log(gender);
 
 
@@ -124,6 +127,23 @@ const CreatePasswordPage = ({ route, navigation }) => {
   }
 };
 
+  const onDateChange = (event, selectedDate) => {
+    setShowPicker(Platform.OS === 'ios');
+    if (event.type === 'dismissed') {
+      return;
+    }
+    if (selectedDate) {
+      setDate(selectedDate);
+      // Format date to YYYY-MM-DD
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      setDateOfBirth(formattedDate);
+    }
+  };
+
+  const showDatePicker = () => {
+    setShowPicker(true);
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -164,13 +184,14 @@ const CreatePasswordPage = ({ route, navigation }) => {
           onChangeText={setPhoneNumber}
           keyboardType="phone-pad"
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Ngày sinh (YYYY-MM-DD)"
-          placeholderTextColor="#888"
-          value={dateOfBirth}
-          onChangeText={setDateOfBirth}
-        />
+        <TouchableOpacity 
+          style={styles.input} 
+          onPress={showDatePicker}
+        >
+          <Text style={[styles.dateText, !dateOfBirth && styles.placeholderText]}>
+            {dateOfBirth || 'Chọn ngày sinh'}
+          </Text>
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           placeholder="Nhập mật khẩu"
@@ -200,6 +221,17 @@ const CreatePasswordPage = ({ route, navigation }) => {
         <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
           <Text style={styles.registerButtonText}>Đăng ký</Text>
         </TouchableOpacity>
+
+        {showPicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            maximumDate={new Date()} // Không cho chọn ngày trong tương lai
+            minimumDate={new Date(1900, 0, 1)} // Giới hạn năm sinh từ 1900
+          />
+        )}
       </ImageBackground>
     </View>
   );
@@ -259,6 +291,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
     color: '#000',
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#000',
+    paddingVertical: 12,
+  },
+  placeholderText: {
+    color: '#888',
   },
 });
 
