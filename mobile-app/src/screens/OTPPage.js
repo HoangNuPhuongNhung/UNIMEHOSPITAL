@@ -5,7 +5,7 @@ const OTPPage = ({ route, navigation }) => {
   const { email, otp } = route.params; // Lấy email và mã OTP từ RegisterPage
   const [userInputOtp, setUserInputOtp] = useState(['', '', '', '']); // Khởi tạo userInputOtp
   const otpRefs = useRef([]);
-  const [isResending, setIsResending] = useState(false);
+  //const [isResending, setIsResending] = useState(false);
 
   const handleChange = (text, index) => {
     const newOtp = [...userInputOtp];

@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Alert
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import { getUserInfo } from '../services/authService';
+import { UserContext } from '../contexts/UserContext';
+
 const ProfilePage = ({ route }) => {
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
-  const [userInfo, setUserInfo] = useState(null);
+  const { userInfo } = useContext(UserContext);
+
 
   const handleLogout = () => {
     Alert.alert(
@@ -27,19 +29,6 @@ const ProfilePage = ({ route }) => {
       { cancelable: true }
     );
   };
-  const fetchUserInfo = async () => {
-    try {
-      const data = await getUserInfo(); // Lấy thông tin user từ API
-      setUserInfo(data); // Lưu thông tin user vào state
-      console.log(data);
-    } catch (error) {
-      console.error('Lỗi lấy thông tin user:', error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
 
   return (
     <ImageBackground
@@ -63,7 +52,7 @@ const ProfilePage = ({ route }) => {
           <Icon name="pencil" size={24} color="#4D9DE0" style={styles.editIcon} />
         </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('UserInfo')}>
           <Text style={styles.buttonText}>Thông tin cá nhân</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button}>

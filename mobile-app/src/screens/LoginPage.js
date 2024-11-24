@@ -1,8 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext'
+import {getUserInfo} from '../services/authService'
+import { UserContext } from '../contexts/UserContext';
 const LoginPage = ({ navigation }) => {
   const { login, loading } = useContext(AuthContext);
+  const {userInfo, updateUserInfo} = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   // console.log({ login, loading }); 
@@ -42,7 +45,9 @@ const LoginPage = ({ navigation }) => {
     const isSuccess = await login(username, password); // Gọi hàm login
     if (isSuccess) {
       Alert.alert('Thành công', 'Đăng nhập thành công');
-      navigation.navigate('bottom tab'); // Điều hướng
+      const data = await getUserInfo();
+      updateUserInfo(data);
+      navigation.navigate('bottom tab'); // Điều hướng 
     }
     } catch (error) {
       Alert.alert('Lỗi', error.message || 'Tên đăng nhập hoặc mật khẩu không chính xác!');

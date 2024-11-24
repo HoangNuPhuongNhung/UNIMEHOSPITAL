@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-
+import React, { useEffect,useContext  } from 'react';
+import { UserContext } from '../contexts/UserContext';
 const API_URL = 'https://api.unime.site/UNIME/auth/token'; 
+
 
 export const login = async (username, password) => {
   console.log(username, ' ## ', password);
@@ -30,6 +32,27 @@ export const login = async (username, password) => {
       }
 
       await AsyncStorage.setItem('userToken', JSON.stringify(token));
+
+          // try {
+          //   const data = await getUserInfo();
+          //   updateUserInfo(data); // Cập nhật thông tin vào context
+          // } catch (error) {
+          //   console.error('Lỗi lấy thông tin:', error.message);
+          // }
+
+      // useEffect(() => {
+      //   const fetchUserData = async () => {
+      //     try {
+      //       const data = await getUserInfo();
+      //       updateUserInfo(data); // Cập nhật thông tin vào context
+      //     } catch (error) {
+      //       console.error('Lỗi lấy thông tin:', error.message);
+      //     }
+      //   };
+    
+      //   fetchUserData();
+      // }, []);
+      //console.log(userInfo);
       return response.data.result;
     } else {
       throw new Error('Invalid response format');
@@ -52,6 +75,7 @@ export const logout = async () => {
 
 export const getToken = async () => {
   const tokenString = await AsyncStorage.getItem('userToken');
+  //console.log(tokenString);
   return tokenString ? JSON.parse(tokenString) : null;
 };
 

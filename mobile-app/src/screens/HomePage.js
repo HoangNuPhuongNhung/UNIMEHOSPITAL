@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import { View, Text, FlatList, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AntDesign } from '@expo/vector-icons';
 // import { Path, SvgUri } from "react-native-svg";
 // import Svg, { Circle } from 'react-native-svg';
 import { Path, Svg, Circle } from "react-native-svg";
-import { getUserInfo } from '../services/authService';
+import { UserContext } from '../contexts/UserContext';
+
 const appointments = [
   { id: 1, title: 'Tâm lý', place: 'Phòng khám Saigon', date: '25 Sep', time: '10:30am', icon: 'account' },
   { id: 2, title: 'Tiêu hóa', place: 'Bệnh viện chợ rẫy', date: '26 Sep', time: '10:30am', icon: 'account' },
@@ -24,8 +25,9 @@ const categories = [
 
 
 const HomePage = () => {
+  const { userInfo, updateUserInfo } = useContext(UserContext);
   const [greeting, setGreeting] = useState('');
-  const [userInfo, setUserInfo] = useState(null);
+
 
   const getGreeting = () => {
     const currentHour = new Date().getHours();
@@ -34,20 +36,6 @@ const HomePage = () => {
     else return 'Chào buổi tối!';
   };
 
-  const fetchUserInfo = async () => {
-    try {
-      const data = await getUserInfo(); // Lấy thông tin user từ API
-      setUserInfo(data); // Lưu thông tin user vào state
-      console.log(data);
-    } catch (error) {
-      console.error('Lỗi lấy thông tin user:', error.message);
-    }
-  };
-
-  useEffect(() => {
-    setGreeting(getGreeting());
-    fetchUserInfo();
-  }, []);
 
   const renderItem = ({ item }) => (
     <View style={styles.appointmentCard}>

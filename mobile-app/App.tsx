@@ -2,7 +2,8 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { AuthProvider } from './src/contexts/AuthContext'; 
+import { AuthProvider } from './src/contexts/AuthContext';
+import { UserProvider } from './src/contexts/UserContext';
 import StartPage from './src/screens/StartPage';
 import LoginPage from './src/screens/LoginPage';
 import RegisterPage from './src/screens/RegisterPage';
@@ -17,27 +18,32 @@ import AppointmentSuccessPage from './src/screens/AppointmentSuccessPage';
 
 import BottomTab from './src/navigations/BottomTab';
 import { createStackNavigator } from '@react-navigation/stack';
+import UserInfoPage from './src/screens/UserInfoPage';
 
 const StackNavigator = createStackNavigator();
 
 export default function App() {
   return (
-    <AuthProvider> 
-      <NavigationContainer>
-        <StackNavigator.Navigator initialRouteName="bottom Tab">
-          <StackNavigator.Screen name="Start" component={StartPage} options={{ headerShown: false }} />
-          <StackNavigator.Screen name="Login" component={LoginPage} options={{ headerShown: false }} />
-          <StackNavigator.Screen name="Register" component={RegisterPage} options={{ headerShown: false }} />
-          <StackNavigator.Screen name="OTP" component={OTPPage} options={{ headerShown: false }} />
-          <StackNavigator.Screen name="CreatePassword" component={CreatePasswordPage} options={{ headerShown: false }} />
-          <StackNavigator.Screen name="bottom tab" component={BottomTab} options={{ headerShown: false }} />
-          <StackNavigator.Screen name="change password" component={ChangePasswordPage} options={{ title: 'Hồ sơ' }} />
-          <StackNavigator.Screen name="DoctorDetailPage" component={DoctorDetailPage} options={{ title: 'Danh sách bác sĩ' }} />
-          <StackNavigator.Screen name="book doctor" component={BookDoctorAppointment} options={{ title: 'Thông tin bác sĩ' }} />
-          <StackNavigator.Screen name="appointment success" component={AppointmentSuccessPage} options={{ title: 'Đặt lịch' }} />
-        </StackNavigator.Navigator>
-      </NavigationContainer>
-    </AuthProvider>
+    <UserProvider>
+      <AuthProvider>
+
+        <NavigationContainer>
+          <StackNavigator.Navigator initialRouteName="bottom Tab">
+            <StackNavigator.Screen name="Start" component={StartPage} options={{ headerShown: false }} />
+            <StackNavigator.Screen name="Login" component={LoginPage} options={{ headerShown: false }} />
+            <StackNavigator.Screen name="Register" component={RegisterPage} options={{ headerShown: false }} />
+            <StackNavigator.Screen name="OTP" component={OTPPage} options={{ headerShown: false }} />
+            <StackNavigator.Screen name="CreatePassword" component={CreatePasswordPage} options={{ headerShown: false }} />
+            <StackNavigator.Screen name="bottom tab" component={BottomTab} options={{ headerShown: false }} />
+            <StackNavigator.Screen name="change password" component={ChangePasswordPage} options={{ title: 'Hồ sơ' }} />
+            <StackNavigator.Screen name="DoctorDetailPage" component={DoctorDetailPage} options={{ title: 'Danh sách bác sĩ' }} />
+            <StackNavigator.Screen name="book doctor" component={BookDoctorAppointment} options={{ title: 'Thông tin bác sĩ' }} />
+            <StackNavigator.Screen name="appointment success" component={AppointmentSuccessPage} options={{ title: 'Đặt lịch' }} />
+            <StackNavigator.Screen name="UserInfo" component={UserInfoPage} options={{ title: 'Thông tin cá nhân' }} />
+          </StackNavigator.Navigator>
+        </NavigationContainer>
+      </AuthProvider>
+    </UserProvider>
   );
 }
 
