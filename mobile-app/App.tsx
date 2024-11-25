@@ -19,7 +19,7 @@ import AppointmentSuccessPage from './src/screens/AppointmentSuccessPage';
 import BottomTab from './src/navigations/BottomTab';
 import { createStackNavigator } from '@react-navigation/stack';
 import UserInfoPage from './src/screens/UserInfoPage';
-
+import ForgotPwPage from './src/screens/ForgotPasswordPage';
 const StackNavigator = createStackNavigator();
 
 export default function App() {
@@ -40,6 +40,7 @@ export default function App() {
             <StackNavigator.Screen name="book doctor" component={BookDoctorAppointment} options={{ title: 'Thông tin bác sĩ' }} />
             <StackNavigator.Screen name="appointment success" component={AppointmentSuccessPage} options={{ title: 'Đặt lịch' }} />
             <StackNavigator.Screen name="UserInfo" component={UserInfoPage} options={{ title: 'Thông tin cá nhân' }} />
+            <StackNavigator.Screen name="ForgotPw" component={ForgotPwPage} options={{ headerShown: false }} />
           </StackNavigator.Navigator>
         </NavigationContainer>
       </AuthProvider>
