@@ -2,22 +2,37 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getToken } from '../services/authService';
-import { selectAndUploadImage,requestStoragePermission } from '../services/imageService';
+import { selectAndUploadImage } from '../services/imageService';
 import { UserContext } from '../contexts/UserContext';
+import * as ImagePicker from 'expo-image-picker';
 const UserInfoPage = () => {
-    const { userInfo,updateUserInfo  } = useContext(UserContext);
+    const { userInfo, updateUserInfo } = useContext(UserContext);
 
-      const [name, setName] = useState(userInfo?.patientName || '');
-      const [phone, setPhone] = useState(userInfo?.patientPhoneNumber || '');
-      const [birthdate, setBirthdate] = useState(userInfo?.patientDateOfBirth || '');
-      const [address, setAddress] = useState(userInfo?.patientAddress || '');
-      const initialGender = userInfo?.patientGender === true ? 'male' : 'female';
-      const [gender, setGender] = useState(initialGender);
-      const [showPicker, setShowPicker] = useState(false);
-      const [date, setDate] = useState(new Date());
-      const [image, setImage] = useState(userInfo?.patientImage || '');
+    const [name, setName] = useState(userInfo?.patientName || '');
+    const [phone, setPhone] = useState(userInfo?.patientPhoneNumber || '');
+    const [birthdate, setBirthdate] = useState(userInfo?.patientDateOfBirth || '');
+    const [address, setAddress] = useState(userInfo?.patientAddress || '');
+    const initialGender = userInfo?.patientGender === true ? 'male' : 'female';
+    const [gender, setGender] = useState(initialGender);
+    const [showPicker, setShowPicker] = useState(false);
+    const [date, setDate] = useState(new Date());
+    const [image, setImage] = useState(userInfo?.patientImage || '');
 
 
+    const openImagePicker = async () => {
+        try {
+            const uploadedUrl = await selectAndUploadImage(); // Chọn và upload ảnh
+            if (uploadedUrl) {
+                setImage(uploadedUrl); // Lưu URL vào state
+                Alert.alert('Thành công', 'Ảnh đã được tải lên!');
+            } else {
+                Alert.alert('Lỗi', 'Không thể tải ảnh lên!');
+            }
+        } catch (error) {
+            console.error('Error selecting/uploading image:', error);
+            Alert.alert('Lỗi', 'Đã xảy ra lỗi khi chọn hoặc tải ảnh!');
+        }
+    };
 
     const onDateChange = (event, selectedDate) => {
         setShowPicker(Platform.OS === 'ios');
@@ -89,23 +104,7 @@ const UserInfoPage = () => {
     };
     return (
         <View style={styles.container}>
-            <TouchableOpacity
-                style={styles.avatarContainer}
-                onPress={async () => {
-                    const hasPermission = await requestStoragePermission(); // Yêu cầu quyền
-                    if (hasPermission) {
-                        const uploadedUrl = await selectAndUploadImage(); // Mở thư viện ảnh và tải lên
-                        if (uploadedUrl) {
-                            setImage(uploadedUrl); // Cập nhật ảnh hiển thị
-                        }
-                    } else {
-                        Alert.alert(
-                            'Quyền bị từ chối',
-                            'Bạn cần cấp quyền truy cập để chọn ảnh từ thư viện.'
-                        );
-                    }
-                }}
-            >
+            <TouchableOpacity style={styles.avatarContainer} onPress={openImagePicker}>
                 <Image
                     source={{ uri: image || userInfo?.patientImage }}
                     style={styles.avatar}

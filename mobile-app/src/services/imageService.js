@@ -1,72 +1,73 @@
-import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
 
-// Hàm upload ảnh lên Cloudinary
+const getFileForUpload = async (uri) => {
+  const newUri = FileSystem.cacheDirectory + 'temp_upload.jpg'; 
+  await FileSystem.copyAsync({
+    from: uri,
+    to: newUri,
+  });
+  return {
+    uri: newUri,
+    type: 'image/jpeg', // Định dạng MIME
+    name: 'temp_upload.jpg', // Tên file
+  };
+};
+
 const uploadToCloudinary = async (file) => {
+
+
   const data = new FormData();
   data.append('file', {
     uri: file.uri,
-    type: file.type, // Loại file, ví dụ: image/jpeg
-    name: file.fileName, // Tên file
+    type: file.type || 'image/jpeg', // Định dạng ảnh
+    name: file.name || 'upload.jpg', // Tên ảnh
   });
-  data.append('upload_preset', 'upload-avatar'); // Thay bằng upload preset của bạn
-
+  data.append('upload_preset', 'upload-avatar');
+  console.log('FormData:', data);
   try {
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/dy8p5yjsd/image/upload`,
-      data
+      data,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
     console.log('Uploaded successfully:', response.data);
     return response.data.secure_url; // URL của ảnh sau khi upload
   } catch (error) {
     console.error('Upload failed:', error);
-    return null; // Trả về null nếu lỗi
+    return null;
   }
 };
 
-import { PermissionsAndroid } from 'react-native';
-
-const requestStoragePermission = async () => {
-    try {
-        const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-            {
-                title: 'Quyền truy cập thư viện ảnh',
-                message: 'Ứng dụng cần quyền truy cập vào thư viện ảnh của bạn.',
-                buttonNeutral: 'Để sau',
-                buttonNegative: 'Hủy',
-                buttonPositive: 'OK',
-            }
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch (err) {
-        console.warn(err);
-        return false;
-    }
-};
-
-// Hàm chọn và tải ảnh
 export const selectAndUploadImage = async () => {
   try {
-    const result = await new Promise((resolve, reject) => {
-      launchImageLibrary({}, (response) => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-          reject('User cancelled image picker');
-        } else if (response.errorCode) {
-          console.error('Image Picker Error: ', response.errorMessage);
-          reject(response.errorMessage);
-        } else {
-          resolve(response.assets[0]); // Trả về asset ảnh
-        }
-      });
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert('Ứng dụng cần quyền truy cập thư viện ảnh!');
+      return null;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
     });
 
-    // Tải ảnh lên Cloudinary
-    const uploadedUrl = await uploadToCloudinary(result);
-    return uploadedUrl; // Trả về URL ảnh sau khi upload
+    if (!result.canceled) {
+      const file = await getFileForUpload(result.assets[0].uri); // Chuyển đổi URI
+      const uploadedUrl = await uploadToCloudinary(file);
+      console.log('Uploaded image URL:', uploadedUrl);
+      return uploadedUrl;
+    } else {
+      console.log('User cancelled image picker');
+      return null;
+    }
   } catch (error) {
     console.error('Error selecting/uploading image:', error);
-    return null; // Trả về null nếu lỗi
+    return null;
   }
 };
