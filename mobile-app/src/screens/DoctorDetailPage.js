@@ -1,29 +1,45 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
 
 const DoctorDetailPage = ({ route }) => {
-  const { doctor } = route.params; // Lấy dữ liệu bác sĩ từ route params
-  const navigation = useNavigation();
+  const { doctor } = route.params; // Lấy thông tin bác sĩ từ params
 
   return (
     <ScrollView style={styles.container}>
-      {/* Hiển thị hình ảnh bác sĩ */}
-      <Image source={{ uri: doctor.avatar }} style={styles.profileImage} />
-      {/* Hiển thị tên bác sĩ */}
-      <Text style={styles.name}>{doctor.name}</Text>
-      {/* Hiển thị chuyên khoa */}
-      <Text style={styles.specialty}>Chuyên khoa: {doctor.specitalty}</Text>
-      {/* Hiển thị địa chỉ */}
-      <Text style={styles.address}>Địa chỉ: {doctor.address}</Text>
-      {/* Hiển thị thông tin chi tiết */}
-      <Text style={styles.info}>Thông tin: {doctor.info}</Text>
+      {/* Hình ảnh bác sĩ */}
+      <Image source={{ uri: doctor.doctorImage }} style={styles.profileImage} />
 
-      {/* Nút để đặt lịch khám */}
+      {/* Tên bác sĩ */}
+      <Text style={styles.name}>{doctor.doctorName}</Text>
+
+      {/* Email */}
+      <Text style={styles.info}>Email: {doctor.email}</Text>
+
+      {/* Giới tính */}
+      <Text style={styles.info}>Giới tính: {doctor.doctorGender ? 'Nam' : 'Nữ'}</Text>
+
+      {/* Ngày sinh */}
+      <Text style={styles.info}>Ngày sinh: {doctor.doctorDateOfBirth}</Text>
+
+      {/* Chuyên khoa */}
+      <Text style={styles.info}>Chuyên khoa: {doctor.departmentName}</Text>
+
+      {/* Địa chỉ */}
+      <Text style={styles.info}>Địa chỉ: {doctor.doctorAddress}</Text>
+
+      {/* Kinh nghiệm */}
+      <Text style={styles.info}>Kinh nghiệm: {doctor.doctordetailExperience}</Text>
+
+      {/* Thông tin chi tiết */}
+      <Text style={styles.info}>Thông tin: {doctor.doctordetailInformation}</Text>
+
+      {/* Giải thưởng */}
+      <Text style={styles.info}>Giải thưởng: {doctor.doctordetailAwardRecognization}</Text>
+
+      {/* Nút đặt lịch */}
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={() => navigation.navigate('book doctor', { doctor })}
+        onPress={() => console.log('Đặt lịch khám!')} // Tùy chỉnh logic
       >
         <Text style={styles.bookButtonText}>Đặt lịch khám</Text>
       </TouchableOpacity>
@@ -37,16 +53,6 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  backText: {
-    fontSize: 16,
-    marginLeft: 8,
-    color: '#333',
-  },
   profileImage: {
     width: 100,
     height: 100,
@@ -58,25 +64,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-  },
-  specialty: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#666',
-    marginVertical: 8,
-  },
-  address: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#666',
-    marginVertical: 8,
+    marginBottom: 8,
   },
   info: {
     fontSize: 14,
-    textAlign: 'center',
-    color: '#666',
-    marginVertical: 8,
-    paddingHorizontal: 10,
+    marginBottom: 10,
+    color: '#333',
   },
   bookButton: {
     backgroundColor: '#4D9DE0',
@@ -84,7 +77,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
-    marginBottom: 120,
   },
   bookButtonText: {
     color: '#fff',

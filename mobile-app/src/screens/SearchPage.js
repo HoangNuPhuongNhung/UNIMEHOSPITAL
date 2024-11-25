@@ -16,16 +16,20 @@ import axios from 'axios';
 const DoctorListPage = () => {
   const [search, setSearch] = useState('');
   const [doctors, setDoctors] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(5); 
+  const [currentIndex, setCurrentIndex] = useState(5);
   const navigation = useNavigation();
-
+  const [selectedDepartment, setSelectedDepartment] = useState('Tất cả');
+  const [departments, setDepartments] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const fetchDoctors = async () => {
     try {
-      const response = await axios.get('https://6720cd2f98bbb4d93ca61a67.mockapi.io/api/v1/doctors');
-      setDoctors(response.data); 
+      const response = await axios.get('https://api.unime.site/UNIME/doctors/get/doctorList');
+      setDoctors(response.data.result);
+      const uniqueDepartments = [...new Set(response.data.result.map((doc) => doc.departmentName))];
+      setDepartments(['Tất cả', ...uniqueDepartments]);
     } catch (error) {
-      console.error(error); 
+      console.error('Error fetching doctors:', error);
     }
   };
 
@@ -34,8 +38,19 @@ const DoctorListPage = () => {
   }, []);
 
   const loadMoreDoctors = () => {
-    setCurrentIndex((prevIndex) => prevIndex + 5); 
+    setCurrentIndex((prevIndex) => prevIndex + 5);
   };
+
+
+  const filteredDoctors = doctors.filter((doctor) => {
+    const matchesDepartment =
+      selectedDepartment === 'Tất cả' || doctor.departmentName === selectedDepartment;
+  
+    const matchesSearch = doctor.doctorName.toLowerCase().includes(search.toLowerCase());
+  
+    return matchesDepartment && matchesSearch;
+  });
+  
 
   return (
     <ImageBackground
@@ -44,11 +59,29 @@ const DoctorListPage = () => {
       resizeMode="cover"
     >
       <ScrollView style={styles.container}>
+
         <View style={styles.filterContainer}>
           <Text style={styles.label}>Chuyên khoa</Text>
           <View style={styles.dropdown}>
-            <Text>Tất cả</Text>
-            <Icon name="arrow-drop-down" size={24} color="#333" />
+            <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
+              <Text>{selectedDepartment}</Text>
+              <Icon name="arrow-drop-down" size={24} color="#333" />
+            </TouchableOpacity>
+            {showDropdown && (
+              <View style={styles.dropdownMenu}>
+                {departments.map((dept, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      setSelectedDepartment(dept);
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownItem}>{dept}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
         </View>
 
@@ -63,13 +96,13 @@ const DoctorListPage = () => {
           <Icon name="search" size={24} color="#333" style={styles.searchIcon} />
         </View>
 
-        {doctors.slice(0, currentIndex).map((doctor) => (
-          <View key={doctor.id} style={styles.card}>
-            <Image source={{ uri: doctor.avatar }} style={styles.doctorImage} />
+        {filteredDoctors.slice(0, currentIndex).map((doctor) => (
+          <View key={doctor.doctorId} style={styles.card}>
+            <Image source={{ uri: doctor.doctorImage }} style={styles.doctorImage} />
             <View style={styles.infoContainer}>
-              <Text style={styles.doctorName}>{doctor.name}</Text>
-              <Text style={styles.specialty}>{doctor.specitalty}</Text>
-              <Text style={styles.hospital}>{doctor.address}</Text>
+              <Text style={styles.doctorName}>{doctor.doctorName}</Text>
+              <Text style={styles.specialty}>{doctor.departmentName}</Text>
+              <Text style={styles.hospital}>{doctor.doctorAddress}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={styles.button}
@@ -88,7 +121,7 @@ const DoctorListPage = () => {
           </View>
         ))}
 
-        {currentIndex < doctors.length && (
+        {currentIndex < filteredDoctors.length && (
           <TouchableOpacity style={styles.loadMoreButton} onPress={loadMoreDoctors}>
             <Text style={styles.loadMoreText}>Xem thêm</Text>
           </TouchableOpacity>
@@ -148,11 +181,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -204,6 +234,22 @@ const styles = StyleSheet.create({
   },
   loadMoreText: {
     color: '#fff',
+    fontSize: 16,
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 40,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 5,
+    zIndex: 10,
+  },
+  dropdownItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
     fontSize: 16,
   },
 });
