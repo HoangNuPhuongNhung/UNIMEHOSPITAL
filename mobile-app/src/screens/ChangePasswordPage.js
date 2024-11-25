@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ChangePasswordScreen() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -9,6 +11,69 @@ export default function ChangePasswordScreen() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const resetForm = () => {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      Alert.alert('Lỗi', 'Mật khẩu không được để trống!');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      Alert.alert('Lỗi', 'Mật khẩu mới phải có ít nhất 6 ký tự!');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp!');
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      Alert.alert('Lỗi', 'Mật khẩu mới không được trùng với mật khẩu hiện tại!');
+      return;
+    }
+    const tokenString = await AsyncStorage.getItem('userToken');
+    const token = tokenString ? JSON.parse(tokenString) : null;
+    if (!token || !token.raw) { 
+      console.log("Token không tồn tại");
+      Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
+      return;
+    }
+    console.log(token);
+    const data = {
+      oldPassword: currentPassword,
+      newPassword: newPassword,
+    };
+    console.log(data);
+    try {
+      const response = await axios.put(
+        'https://api.unime.site/UNIME/password',
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token.raw}`,
+          },
+        }
+      );
+
+      if (response.data.code !== 1000) {
+        Alert.alert('Lỗi', 'Mật khẩu hiện tại không đúng!');
+        return;
+      }
+
+      Alert.alert('Thành công', 'Mật khẩu đã được đổi thành công!');
+      resetForm();
+    } catch (error) {
+      console.error('Error changing password:', error);
+      Alert.alert('Lỗi', 'Đã xảy ra lỗi, vui lòng thử lại sau.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -60,7 +125,7 @@ export default function ChangePasswordScreen() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
         <Text style={styles.buttonText}>Xong</Text>
       </TouchableOpacity>
     </View>

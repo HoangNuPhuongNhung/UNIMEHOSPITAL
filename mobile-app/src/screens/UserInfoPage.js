@@ -4,7 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { getToken } from '../services/authService';
 import { selectAndUploadImage } from '../services/imageService';
 import { UserContext } from '../contexts/UserContext';
-import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
 const UserInfoPage = () => {
     const { userInfo, updateUserInfo } = useContext(UserContext);
 
@@ -80,17 +80,19 @@ const UserInfoPage = () => {
                 patientDateOfBirth: birthdate,
             };
 
-            const response = await fetch('https://api.unime.site/UNIME/patients/update', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token.raw}`,
-                },
-                body: JSON.stringify(payload),
-            });
+            const response = await axios.put(
+                'https://api.unime.site/UNIME/patients/update',
+                payload,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token.raw}`,
+                    },
+                }
+            );
+    
 
-            if (response.ok) {
-                const result = await response.json();
+            if (response.status === 200) {
                 updateUserInfo(payload);
                 Alert.alert('Thành công', 'Cập nhật thông tin thành công!');
             } else {
