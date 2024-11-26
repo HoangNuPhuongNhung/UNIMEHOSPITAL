@@ -44,7 +44,7 @@ const BookDoctorAppointment = ({ route }) => {
       doctor, 
       date: selectedDate, 
       time: selectedTime, 
-      service: selectedService, 
+      selectedService, 
       price: selectedService?.servicePrice, 
     });
     console.log('Bookdoctor');

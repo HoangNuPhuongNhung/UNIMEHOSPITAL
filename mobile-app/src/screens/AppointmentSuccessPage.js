@@ -7,8 +7,8 @@ const AppointmentSuccessPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { doctor, date, time, service, price } = route.params;
-
+  const { doctor, date, time, selectedService, servicePrice } = route.params;
+  console.log(doctor, date, time, selectedService, servicePrice);
   return (
     <View style={styles.container}>
 
@@ -42,7 +42,7 @@ const AppointmentSuccessPage = () => {
 
         <View style={styles.infoRow}>
           <Icon name="medical-services" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>Dịch vụ: {service}</Text>
+          <Text style={styles.infoText}>Dịch vụ: {selectedService.serviceName}</Text>
         </View>
 
         {/* <View style={styles.infoRow}>
@@ -52,7 +52,7 @@ const AppointmentSuccessPage = () => {
 
         <View style={styles.infoRow}>
           <Icon name="attach-money" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>Giá tiền: {price}</Text>
+          <Text style={styles.infoText}>Giá tiền: {selectedService?.servicePrice.toLocaleString()} đ</Text>
         </View>
       </View>
 
