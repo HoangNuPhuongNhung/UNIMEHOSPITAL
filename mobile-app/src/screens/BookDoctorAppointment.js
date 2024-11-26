@@ -19,25 +19,27 @@ const BookDoctorAppointment = ({ route }) => {
     '11:00 - 11:30', '11:30 - 12:00', '1:00 - 1:30'
   ];
   useEffect(() => {
-    axios.get('https://api.unime.site/UNIME/services/get/serviceList')
-      .then(response => {
-        const services = response.data?.result; 
-        if (Array.isArray(services)) {
-          setServiceList(services);
+    if (doctor.doctorId) {
+      axios
+        .get(`https://api.unime.site/UNIME/doctorservice/get/serviceList/${doctor.doctorId}`)
+        .then(response => {
+          const services = response.data?.result;
+          if (Array.isArray(services)) {
+            setServiceList(services);
+            setFilteredServices(services); // Toàn bộ danh sách là filtered services.
   
-          const filtered = services.filter(service => service.departmentName === doctor.departmentName);
-          setFilteredServices(filtered);
-  
-          if (filtered.length > 0) {
-            setSelectedService(filtered[0]);
+            if (services.length > 0) {
+              setSelectedService(services[0]); // Chọn dịch vụ đầu tiên mặc định.
+            }
+          } else {
+            console.error('Unexpected data format:', response.data);
+            setServiceList([]);
+            setFilteredServices([]);
           }
-        } else {
-          console.error('Unexpected data format:', response.data);
-          setServiceList([]);
-        }
-      })
-      .catch(error => console.error('Error fetching services:', error));
-  }, [doctor.departmentName]);
+        })
+        .catch(error => console.error('Error fetching services:', error));
+    }
+  }, [doctor.doctorId]);
   
   const confirmAppointment = () => {
     navigation.navigate('appointment success', { 
@@ -45,9 +47,7 @@ const BookDoctorAppointment = ({ route }) => {
       date: selectedDate, 
       time: selectedTime, 
       selectedService, 
-      price: selectedService?.servicePrice, 
     });
-    console.log('Bookdoctor');
   };
 
   return (
