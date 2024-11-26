@@ -1,44 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
-
+import axios from 'axios';
 
 const BookDoctorAppointment = ({ route }) => {
   const { doctor } = route.params;
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState(null);
-  const [service, setService] = useState("Khám bệnh");
-  const [note, setNote] = useState("");
+  const [serviceList, setServiceList] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
+  const [selectedService, setSelectedService] = useState(null);
 
   const timeSlots = [
     '9:30 - 10:00', '10:00 - 10:30', '10:30 - 11:00',
     '11:00 - 11:30', '11:30 - 12:00', '1:00 - 1:30'
   ];
-
+  useEffect(() => {
+    axios.get('https://api.unime.site/UNIME/services/get/serviceList')
+      .then(response => {
+        const services = response.data?.result; 
+        if (Array.isArray(services)) {
+          setServiceList(services);
+  
+          const filtered = services.filter(service => service.departmentName === doctor.departmentName);
+          setFilteredServices(filtered);
+  
+          if (filtered.length > 0) {
+            setSelectedService(filtered[0]);
+          }
+        } else {
+          console.error('Unexpected data format:', response.data);
+          setServiceList([]);
+        }
+      })
+      .catch(error => console.error('Error fetching services:', error));
+  }, [doctor.departmentName]);
+  
   const confirmAppointment = () => {
     navigation.navigate('appointment success', { 
       doctor, 
       date: selectedDate, 
       time: selectedTime, 
-      service, 
-      price: getServicePrice(service), 
-      note 
+      service: selectedService, 
+      price: selectedService?.servicePrice, 
     });
     console.log('Bookdoctor');
-  };
-
-  const getServicePrice = (service) => {
-    switch (service) {
-      case 'Khám bệnh':
-        return '500,000 đ';
-      case 'Tư vấn':
-        return '200,000 đ';
-      default:
-        return '0 đ';
-    }
   };
 
   return (
@@ -80,19 +89,25 @@ const BookDoctorAppointment = ({ route }) => {
           </TouchableOpacity>
         ))}
       </View>
-
       <Text style={styles.sectionTitle}>Chọn dịch vụ</Text>
       <Picker
-        selectedValue={service}
-        onValueChange={(itemValue) => setService(itemValue)}
+        selectedValue={selectedService?.serviceId}
+        onValueChange={(itemValue) => {
+          const selected = filteredServices.find(service => service.serviceId === itemValue);
+          setSelectedService(selected);
+        }}
         style={styles.picker}
       >
-        <Picker.Item label="Khám bệnh" value="Khám bệnh" />
-        <Picker.Item label="Tư vấn" value="Tư vấn" />
+        {filteredServices.map(service => (
+          <Picker.Item 
+            key={service.serviceId} 
+            label={`${service.serviceName}`} 
+            value={service.serviceId} 
+          />
+        ))}
       </Picker>
-
       <Text style={styles.priceLabel}>Giá tiền:</Text>
-      <Text style={styles.price}>{getServicePrice(service)}</Text>
+      <Text style={styles.price}>{selectedService?.servicePrice.toLocaleString()} đ</Text>
 
       {/* <Text style={styles.sectionTitle}>Ghi chú</Text>
       <TextInput
