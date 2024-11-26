@@ -7,7 +7,7 @@ const AppointmentSuccessPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { doctor, date, time, service, price, note } = route.params;
+  const { doctor, date, time, service, price } = route.params;
 
   return (
     <View style={styles.container}>
@@ -22,8 +22,8 @@ const AppointmentSuccessPage = () => {
         <View style={styles.infoRow}>
           <Icon name="person" size={24} color="#4D9DE0" />
           <View style={styles.textContainer}>
-            <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">{doctor.name}</Text>
-            <Text style={styles.subInfoText}>Chuyên khoa: {doctor.specitalty}</Text>
+            <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">{doctor.doctorName}</Text>
+            <Text style={styles.subInfoText}>Chuyên khoa: {doctor.departmentName}</Text>
           </View>
         </View>
 
@@ -37,7 +37,7 @@ const AppointmentSuccessPage = () => {
 
         <View style={styles.infoRow}>
           <Icon name="location-on" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>Địa chỉ: {doctor.address}</Text>
+          <Text style={styles.infoText}>Địa chỉ: {doctor.doctorAddress}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -45,14 +45,14 @@ const AppointmentSuccessPage = () => {
           <Text style={styles.infoText}>Dịch vụ: {service}</Text>
         </View>
 
-        <View style={styles.infoRow}>
+        {/* <View style={styles.infoRow}>
           <Icon name="note" size={24} color="#4D9DE0" />
           <Text style={styles.infoText}>Ghi chú: {note || 'Không có ghi chú'}</Text>
-        </View>
+        </View> */}
 
         <View style={styles.infoRow}>
           <Icon name="attach-money" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>Giá tiền: {price}₫</Text>
+          <Text style={styles.infoText}>Giá tiền: {price}</Text>
         </View>
       </View>
 

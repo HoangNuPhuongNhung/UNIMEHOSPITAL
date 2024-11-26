@@ -1,45 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 
-const DoctorDetailPage = ({ route }) => {
-  const { doctor } = route.params; // Lấy thông tin bác sĩ từ params
+const DoctorDetailPage = ({ route,navigation }) => {
+  const { doctor } = route.params; 
 
   return (
     <ScrollView style={styles.container}>
-      {/* Hình ảnh bác sĩ */}
       <Image source={{ uri: doctor.doctorImage }} style={styles.profileImage} />
 
-      {/* Tên bác sĩ */}
       <Text style={styles.name}>{doctor.doctorName}</Text>
 
-      {/* Email */}
       <Text style={styles.info}>Email: {doctor.email}</Text>
 
-      {/* Giới tính */}
       <Text style={styles.info}>Giới tính: {doctor.doctorGender ? 'Nam' : 'Nữ'}</Text>
 
-      {/* Ngày sinh */}
       <Text style={styles.info}>Ngày sinh: {doctor.doctorDateOfBirth}</Text>
 
-      {/* Chuyên khoa */}
       <Text style={styles.info}>Chuyên khoa: {doctor.departmentName}</Text>
 
-      {/* Địa chỉ */}
+    
       <Text style={styles.info}>Địa chỉ: {doctor.doctorAddress}</Text>
 
-      {/* Kinh nghiệm */}
       <Text style={styles.info}>Kinh nghiệm: {doctor.doctordetailExperience}</Text>
 
-      {/* Thông tin chi tiết */}
       <Text style={styles.info}>Thông tin: {doctor.doctordetailInformation}</Text>
 
-      {/* Giải thưởng */}
       <Text style={styles.info}>Giải thưởng: {doctor.doctordetailAwardRecognization}</Text>
 
-      {/* Nút đặt lịch */}
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={() => console.log('Đặt lịch khám!')} // Tùy chỉnh logic
+        onPress={() => navigation.navigate('book doctor', { doctor })} // Tùy chỉnh logic
       >
         <Text style={styles.bookButtonText}>Đặt lịch khám</Text>
       </TouchableOpacity>

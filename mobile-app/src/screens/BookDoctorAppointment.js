@@ -43,10 +43,10 @@ const BookDoctorAppointment = ({ route }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Image source={{ uri: doctor.avatar }} style={styles.profileImage} />
-      <Text style={styles.name}>{doctor.name}</Text>
-      <Text style={styles.specialty}>Chuyên khoa: {doctor.specitalty}</Text>
-      <Text style={styles.address}>Địa chỉ: {doctor.address}</Text>
+      <Image source={{ uri: doctor.doctorImage }} style={styles.profileImage} />
+      <Text style={styles.name}>{doctor.doctorName}</Text>
+      <Text style={styles.specialty}>Chuyên khoa: {doctor.departmentName}</Text>
+      <Text style={styles.address}>Địa chỉ: {doctor.doctorAddress}</Text>
       <Text style={styles.title}>Đặt lịch khám</Text>
 
       <Text style={styles.sectionTitle}>Chọn ngày khám</Text>
@@ -94,19 +94,20 @@ const BookDoctorAppointment = ({ route }) => {
       <Text style={styles.priceLabel}>Giá tiền:</Text>
       <Text style={styles.price}>{getServicePrice(service)}</Text>
 
-      <Text style={styles.sectionTitle}>Ghi chú</Text>
+      {/* <Text style={styles.sectionTitle}>Ghi chú</Text>
       <TextInput
         style={styles.noteInput}
         placeholder="Mô tả vấn đề của bạn."
         multiline
         value={note}
         onChangeText={setNote}
-      />
+      /> */}
 
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={selectedDate && selectedTime ? confirmAppointment : null} 
+        onPress={(selectedDate && selectedTime ? confirmAppointment : null)} 
         disabled={!selectedDate || !selectedTime} 
+        
       >
         <Text style={styles.bookButtonText}>Đặt lịch khám</Text>
       </TouchableOpacity>
