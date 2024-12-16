@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 const BookDoctorAppointment = ({ route }) => {
-  const { doctor } = route.params;
+  const { doctorDetails } = route.params;
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState(null);
@@ -19,9 +19,9 @@ const BookDoctorAppointment = ({ route }) => {
     '11:00 - 11:30', '11:30 - 12:00', '1:00 - 1:30'
   ];
   useEffect(() => {
-    if (doctor.doctorId) {
+    if (doctorDetails.doctorId) {
       axios
-        .get(`https://api.unime.site/UNIME/doctorservice/get/serviceList/${doctor.doctorId}`)
+        .get(`https://api.unime.site/UNIME/doctorservice/get/serviceList/${doctorDetails.doctorId}`)
         .then(response => {
           const services = response.data?.result;
           if (Array.isArray(services)) {
@@ -39,11 +39,11 @@ const BookDoctorAppointment = ({ route }) => {
         })
         .catch(error => console.error('Error fetching services:', error));
     }
-  }, [doctor.doctorId]);
+  }, [doctorDetails.doctorId]);
   
   const confirmAppointment = () => {
     navigation.navigate('appointment success', { 
-      doctor, 
+      doctorDetails, 
       date: selectedDate, 
       time: selectedTime, 
       selectedService, 
@@ -52,10 +52,10 @@ const BookDoctorAppointment = ({ route }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Image source={{ uri: doctor.doctorImage }} style={styles.profileImage} />
-      <Text style={styles.name}>{doctor.doctorName}</Text>
-      <Text style={styles.specialty}>Chuyên khoa: {doctor.departmentName}</Text>
-      <Text style={styles.address}>Địa chỉ: {doctor.doctorAddress}</Text>
+      <Image source={{ uri: doctorDetails.doctorImage }} style={styles.profileImage} />
+      <Text style={styles.name}>{doctorDetails.doctorName}</Text>
+      <Text style={styles.specialty}>Chuyên khoa: {doctorDetails.departmentName}</Text>
+      <Text style={styles.address}>Địa chỉ: {doctorDetails.doctorAddress}</Text>
       <Text style={styles.title}>Đặt lịch khám</Text>
 
       <Text style={styles.sectionTitle}>Chọn ngày khám</Text>

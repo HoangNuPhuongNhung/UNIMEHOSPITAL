@@ -22,35 +22,57 @@ const DoctorListPage = () => {
   const [departments, setDepartments] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const fetchDoctors = async () => {
+  // Fetch departments
+  const fetchDepartments = async () => {
     try {
-      const response = await axios.get('https://api.unime.site/UNIME/doctors/get/doctorList');
-      setDoctors(response.data.result);
-      const uniqueDepartments = [...new Set(response.data.result.map((doc) => doc.departmentName))];
-      setDepartments(['Tất cả', ...uniqueDepartments]);
+      const response = await axios.get('https://api.unime.site/UNIME/departments/get/departmentList');
+      if (response.data.code === 1000) {
+        setDepartments([{ departmentId: 0, departmentName: 'Tất cả' }, ...response.data.result]);
+      }
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
+
+  // Fetch doctors based on department
+  const fetchDoctors = async (departmentId) => {
+    try {
+      let response;
+      if (departmentId === 0) {
+        // Fetch all doctors
+        response = await axios.get('https://api.unime.site/UNIME/doctors/get/doctorList');
+      } else {
+        // Fetch doctors by department
+        response = await axios.get(`http://api.unime.site:8888/UNIME/doctors/get/byDepartment?doctor_departmentId=${departmentId}`);
+      }
+      
+      if (response.data.code === 1000) {
+        setDoctors(response.data.result);
+      }
     } catch (error) {
       console.error('Error fetching doctors:', error);
     }
   };
 
   useEffect(() => {
-    fetchDoctors();
+    fetchDepartments();
+    fetchDoctors(0); // Initially fetch all doctors
   }, []);
+
+  // Handle department selection
+  const handleDepartmentSelect = (department) => {
+    setSelectedDepartment(department.departmentName);
+    fetchDoctors(department.departmentId);
+    setShowDropdown(false);
+  };
 
   const loadMoreDoctors = () => {
     setCurrentIndex((prevIndex) => prevIndex + 5);
   };
 
-
-  const filteredDoctors = doctors.filter((doctor) => {
-    const matchesDepartment =
-      selectedDepartment === 'Tất cả' || doctor.departmentName === selectedDepartment;
-  
-    const matchesSearch = doctor.doctorName.toLowerCase().includes(search.toLowerCase());
-  
-    return matchesDepartment && matchesSearch;
-  });
-  
+  const filteredDoctors = doctors.filter((doctor) => 
+    doctor.doctorName.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <ImageBackground
@@ -58,8 +80,10 @@ const DoctorListPage = () => {
       style={styles.background}
       resizeMode="cover"
     >
-      <ScrollView style={styles.container}>
-
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+      >
         <View style={styles.filterContainer}>
           <Text style={styles.label}>Chuyên khoa</Text>
           <View style={styles.dropdown}>
@@ -69,15 +93,12 @@ const DoctorListPage = () => {
             </TouchableOpacity>
             {showDropdown && (
               <View style={styles.dropdownMenu}>
-                {departments.map((dept, index) => (
+                {departments.map((dept) => (
                   <TouchableOpacity
-                    key={index}
-                    onPress={() => {
-                      setSelectedDepartment(dept);
-                      setShowDropdown(false);
-                    }}
+                    key={dept.departmentId}
+                    onPress={() => handleDepartmentSelect(dept)}
                   >
-                    <Text style={styles.dropdownItem}>{dept}</Text>
+                    <Text style={styles.dropdownItem}>{dept.departmentName}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -101,7 +122,6 @@ const DoctorListPage = () => {
             <Image source={{ uri: doctor.doctorImage }} style={styles.doctorImage} />
             <View style={styles.infoContainer}>
               <Text style={styles.doctorName}>{doctor.doctorName}</Text>
-              <Text style={styles.specialty}>{doctor.departmentName}</Text>
               <Text style={styles.hospital}>{doctor.doctorAddress}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
@@ -135,7 +155,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'rgba(244, 246, 252, 0.2)',
+  },
+  contentContainer: {
     padding: 20,
+    paddingBottom: 150,
   },
   background: {
     flex: 1,
@@ -230,7 +253,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 120,
+    marginTop: 10,
+    marginBottom: 30,
   },
   loadMoreText: {
     color: '#fff',

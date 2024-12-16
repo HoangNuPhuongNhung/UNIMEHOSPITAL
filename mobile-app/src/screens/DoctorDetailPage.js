@@ -68,7 +68,7 @@ const DoctorDetailPage = ({ route, navigation }) => {
 
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={() => navigation.navigate('book doctor', { doctor: doctorDetails })}
+        onPress={() => navigation.navigate('book doctor', { doctorDetails })}
       >
         <Text style={styles.bookButtonText}>Đặt lịch khám</Text>
       </TouchableOpacity>
