@@ -113,6 +113,12 @@ const DoctorListPage = () => {
             placeholder="Tìm kiếm bác sĩ"
             value={search}
             onChangeText={setSearch}
+            keyboardType="default"
+            autoCorrect={false}
+            autoFocus={false}
+            returnKeyType="search"
+            enablesReturnKeyAutomatically={true}
+            blurOnSubmit={true}
           />
           <Icon name="search" size={24} color="#333" style={styles.searchIcon} />
         </View>

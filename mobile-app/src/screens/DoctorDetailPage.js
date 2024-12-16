@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const DoctorDetailPage = ({ route, navigation }) => {
   const { doctor } = route.params;
+  console.log(doctor);
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -68,7 +69,7 @@ const DoctorDetailPage = ({ route, navigation }) => {
 
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={() => navigation.navigate('book doctor', { doctorDetails })}
+        onPress={() => navigation.navigate('book doctor', { doctor })}
       >
         <Text style={styles.bookButtonText}>Đặt lịch khám</Text>
       </TouchableOpacity>

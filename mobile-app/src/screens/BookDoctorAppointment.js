@@ -6,30 +6,38 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 const BookDoctorAppointment = ({ route }) => {
-  const { doctorDetails } = route.params;
+  const { doctor } = route.params;
+  console.log(doctor);
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState(null);
   const [serviceList, setServiceList] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
+  const [doctorDetails, setDoctorDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const timeSlots = [
     '9:30 - 10:00', '10:00 - 10:30', '10:30 - 11:00',
     '11:00 - 11:30', '11:30 - 12:00', '1:00 - 1:30'
   ];
+
   useEffect(() => {
-    if (doctorDetails.doctorId) {
+    fetchDoctorDetails();
+  }, []);
+
+  useEffect(() => {
+    if (doctor?.doctorId) {
       axios
-        .get(`https://api.unime.site/UNIME/doctorservice/get/serviceList/${doctorDetails.doctorId}`)
+        .get(`https://api.unime.site/UNIME/doctorservice/get/serviceList/${doctor.doctorId}`)
         .then(response => {
           const services = response.data?.result;
           if (Array.isArray(services)) {
             setServiceList(services);
-            setFilteredServices(services); // Toàn bộ danh sách là filtered services.
-  
+            setFilteredServices(services);
             if (services.length > 0) {
-              setSelectedService(services[0]); // Chọn dịch vụ đầu tiên mặc định.
+              setSelectedService(services[0]);
             }
           } else {
             console.error('Unexpected data format:', response.data);
@@ -39,8 +47,22 @@ const BookDoctorAppointment = ({ route }) => {
         })
         .catch(error => console.error('Error fetching services:', error));
     }
-  }, [doctorDetails.doctorId]);
-  
+  }, [doctor?.doctorId]);
+
+  const fetchDoctorDetails = async () => {
+    try {
+      const response = await axios.get(`https://api.unime.site/UNIME/doctors/get/getDetail/${doctor.doctorId}`);
+      if (response.data.code === 1000) {
+        setDoctorDetails(response.data.result);
+      }
+    } catch (error) {
+      setError('Error fetching doctor details');
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const confirmAppointment = () => {
     navigation.navigate('appointment success', { 
       doctorDetails, 
@@ -49,6 +71,18 @@ const BookDoctorAppointment = ({ route }) => {
       selectedService, 
     });
   };
+
+  if (loading) {
+    return <View style={styles.container}><Text>Loading...</Text></View>;
+  }
+
+  if (error) {
+    return <View style={styles.container}><Text>{error}</Text></View>;
+  }
+
+  if (!doctorDetails) {
+    return <View style={styles.container}><Text>No doctor details available</Text></View>;
+  }
 
   return (
     <ScrollView style={styles.container}>
