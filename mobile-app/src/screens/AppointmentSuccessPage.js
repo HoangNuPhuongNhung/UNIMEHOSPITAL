@@ -7,8 +7,8 @@ const AppointmentSuccessPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { doctor, date, time, selectedService } = route.params;
-  console.log( doctor, date, time, selectedService);
+  const { doctorDetails, date, time, selectedService } = route.params;
+  console.log( doctorDetails, date, time, selectedService);
   return (
     <View style={styles.container}>
 
@@ -22,8 +22,8 @@ const AppointmentSuccessPage = () => {
         <View style={styles.infoRow}>
           <Icon name="person" size={24} color="#4D9DE0" />
           <View style={styles.textContainer}>
-            <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">{doctor.doctorName}</Text>
-            <Text style={styles.subInfoText}>Chuyên khoa: {doctor.departmentName}</Text>
+            <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">{doctorDetails.doctorName}</Text>
+            <Text style={styles.subInfoText}>Chuyên khoa: {doctorDetails.departmentName}</Text>
           </View>
         </View>
 
@@ -37,7 +37,7 @@ const AppointmentSuccessPage = () => {
 
         <View style={styles.infoRow}>
           <Icon name="location-on" size={24} color="#4D9DE0" />
-          <Text style={styles.infoText}>Địa chỉ: {doctor.doctorAddress}</Text>
+          <Text style={styles.infoText}>Địa chỉ: {doctorDetails.doctorAddress}</Text>
         </View>
 
         <View style={styles.infoRow}>

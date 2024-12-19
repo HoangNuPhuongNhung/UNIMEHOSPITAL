@@ -1,15 +1,16 @@
 import React, { useState,useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 const BookDoctorAppointment = ({ route }) => {
   const { doctor } = route.params;
-  console.log(doctor);
   const navigation = useNavigation();
-  const [selectedDate, setSelectedDate] = useState('');
+  const today = new Date().toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState(today);
   const [selectedTime, setSelectedTime] = useState(null);
   const [serviceList, setServiceList] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -17,11 +18,9 @@ const BookDoctorAppointment = ({ route }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const timeSlots = [
-    '9:30 - 10:00', '10:00 - 10:30', '10:30 - 11:00',
-    '11:00 - 11:30', '11:30 - 12:00', '1:00 - 1:30'
-  ];
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [doctorTimeWork, setDoctorTimeWork] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchDoctorDetails();
@@ -49,6 +48,38 @@ const BookDoctorAppointment = ({ route }) => {
     }
   }, [doctor?.doctorId]);
 
+  useEffect(() => {
+    if (selectedDate && doctorTimeWork.length > 0) {
+      const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+      const selectedDay = days[new Date(selectedDate).getDay()];
+      
+      const availableSlots = doctorTimeWork
+        .filter(slot => 
+          slot.dayOfWeek === selectedDay && 
+          slot.doctorTimeworkStatus === "Available"
+        )
+        .map(slot => ({
+          id: slot.doctorTimeworkId,
+          time: `${slot.startTime.slice(0, 5)} - ${slot.endTime.slice(0, 5)}`
+        }));
+
+      setTimeSlots(availableSlots);
+      setSelectedTime(null);
+    }
+  }, [selectedDate, doctorTimeWork]);
+
+  useEffect(() => {
+    if (doctor?.doctorId) {
+      axios.get(`https://api.unime.site/UNIME/doctortimework/get/listByDoctor/${doctor.doctorId}`)
+        .then(response => {
+          if (response.data.code === 1000) {
+            setDoctorTimeWork(response.data.result);
+          }
+        })
+        .catch(error => console.error('Error fetching timeWork:', error));
+    }
+  }, [doctor?.doctorId]);
+
   const fetchDoctorDetails = async () => {
     try {
       const response = await axios.get(`https://api.unime.site/UNIME/doctors/get/getDetail/${doctor.doctorId}`);
@@ -63,13 +94,53 @@ const BookDoctorAppointment = ({ route }) => {
     }
   };
 
-  const confirmAppointment = () => {
-    navigation.navigate('appointment success', { 
-      doctorDetails, 
-      date: selectedDate, 
-      time: selectedTime, 
-      selectedService, 
-    });
+  const confirmAppointment = async () => {
+    try {
+      setIsLoading(true);
+      
+      const selectedTimeSlot = timeSlots.find(slot => slot.time === selectedTime);
+      
+      if (!selectedTimeSlot || !selectedService) {
+        Alert.alert('Thông báo', 'Vui lòng chọn đầy đủ thông tin đặt lịch');
+        return;
+      }
+      const tokenString = await AsyncStorage.getItem('userToken');
+      const token = tokenString ? JSON.parse(tokenString) : null;
+      if (!token || !token.raw) { 
+        console.log("Token không tồn tại");
+        Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
+        return;
+      }
+      const response = await axios.post(
+        'https://api.unime.site/UNIME/appointments',
+        {
+          doctortimeworkId: selectedTimeSlot.id,
+          doctorserviceId: selectedService.serviceId
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token.raw}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.code === 1000) {
+        navigation.navigate('appointment success', { 
+          doctorDetails, 
+          date: selectedDate, 
+          time: selectedTime, 
+          selectedService, 
+        });
+      } else {
+        Alert.alert('Thông báo', 'Đặt lịch không thành công');
+      }
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      Alert.alert('Thông báo', 'Có lỗi xảy ra khi đặt lịch');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (loading) {
@@ -98,6 +169,7 @@ const BookDoctorAppointment = ({ route }) => {
         markedDates={{
           [selectedDate]: { selected: true, selectedColor: '#4D9DE0' },
         }}
+        minDate={today}
         theme={{
           selectedDayBackgroundColor: '#4D9DE0',
           todayTextColor: '#4D9DE0',
@@ -107,19 +179,19 @@ const BookDoctorAppointment = ({ route }) => {
 
       <Text style={styles.sectionTitle}>Chọn giờ khám</Text>
       <View style={styles.timeSlotsContainer}>
-        {timeSlots.map((time, index) => (
+        {timeSlots.map((slot) => (
           <TouchableOpacity
-            key={index}
+            key={slot.id}
             style={[
               styles.timeSlot,
-              selectedTime === time && styles.selectedTimeSlot
+              selectedTime === slot.time && styles.selectedTimeSlot
             ]}
-            onPress={() => setSelectedTime(time)}
+            onPress={() => setSelectedTime(slot.time)}
           >
             <Text style={[
               styles.timeText,
-              selectedTime === time && styles.selectedTimeText
-            ]}>{time}</Text>
+              selectedTime === slot.time && styles.selectedTimeText
+            ]}>{slot.time}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -153,12 +225,16 @@ const BookDoctorAppointment = ({ route }) => {
       /> */}
 
       <TouchableOpacity
-        style={styles.bookButton}
-        onPress={(selectedDate && selectedTime ? confirmAppointment : null)} 
-        disabled={!selectedDate || !selectedTime} 
-        
+        style={[
+          styles.bookButton,
+          (!selectedDate || !selectedTime || !selectedService) && styles.disabledButton
+        ]}
+        onPress={confirmAppointment}
+        disabled={!selectedDate || !selectedTime || !selectedService || isLoading}
       >
-        <Text style={styles.bookButtonText}>Đặt lịch khám</Text>
+        <Text style={styles.bookButtonText}>
+          {isLoading ? 'Đang xử lý...' : 'Đặt lịch khám'}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -266,6 +342,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  disabledButton: {
+    backgroundColor: '#cccccc',
+    opacity: 0.7
+  }
 });
 
 export default BookDoctorAppointment;
