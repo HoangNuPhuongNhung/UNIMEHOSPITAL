@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import HomePage from './HomePage';
 import SearchPage from './SearchPage';
-import AppointmentPage from './AppointmentPage';
+import ServicePage from './ServicePage';
 import ProfilePage from '.ProfilePage';
 
 const Tab = createBottomTabNavigator();
@@ -19,8 +19,8 @@ const BottomNavigation = () => {
             iconName = 'home-outline';
           } else if (route.name === 'Search') {
             iconName = 'magnify';
-          } else if (route.name === 'Appointments') {
-            iconName = 'calendar-outline';
+          } else if (route.name === 'Service') {
+            iconName = 'hand-heart-outline';
           } else if (route.name === 'Profile') {
             iconName = 'account-outline';
           }
@@ -32,7 +32,7 @@ const BottomNavigation = () => {
     >
       <Tab.Screen name="Home" component={HomePage} options={{ tabBarLabel: 'Trang chủ' }} />
       <Tab.Screen name="Search" component={SearchPage} options={{ tabBarLabel: 'Tìm kiếm' }} />
-      <Tab.Screen name="Appointments" component={AppointmentPage} options={{ tabBarLabel: 'Đặt lịch hẹn' }} />
+      <Tab.Screen name="Service" component={ServicePage} options={{ tabBarLabel: 'Dịch vụ' }} />
       <Tab.Screen name="Profile" component={ProfilePage} options={{ tabBarLabel: 'Hồ sơ' }} />
     </Tab.Navigator>
   );

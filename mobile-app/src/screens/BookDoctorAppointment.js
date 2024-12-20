@@ -7,7 +7,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 const BookDoctorAppointment = ({ route }) => {
-  const { doctor } = route.params;
+  const { doctor, service = null } = route.params;
+  console.log(service);
   const navigation = useNavigation();
   const today = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(today);

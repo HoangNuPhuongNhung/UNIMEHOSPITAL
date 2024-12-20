@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } fr
 import axios from 'axios';
 
 const DoctorDetailPage = ({ route, navigation }) => {
-  const { doctor } = route.params;
-  console.log(doctor);
+  const { doctor, service = null } = route.params;
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

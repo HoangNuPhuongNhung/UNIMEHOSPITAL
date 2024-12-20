@@ -5,6 +5,7 @@ import HomePage from '../screens/HomePage';
 import SearchPage from '../screens/SearchPage';
 import AppointmentPage from '../screens/AppointmentPage';
 import ProfilePage from '../screens/ProfilePage';
+import ServicePage from '../screens/ServicePage';
 import { AntDesign } from '@expo/vector-icons';
 import { Header } from '@react-navigation/stack';
 
@@ -57,12 +58,12 @@ export default function BottomTab() {
         }}
       />
       <BottomTabNavigator.Screen
-        name="Đặt lịch"
-        component={AppointmentPage}
+        name="Dịch vụ"
+        component={ServicePage}
         options={{
           tabBarIcon: ({ focused }) => (
             <AntDesign
-              name="table"
+              name="hearto"
               size={22}
               color={focused ? '#0071ff' : 'gray'}
             />
