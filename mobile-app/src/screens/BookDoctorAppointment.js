@@ -1,14 +1,14 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BookDoctorAppointment = ({ route }) => {
   const { doctor, service = null } = route.params;
-  console.log(service);
+  // console.log(service);
   const navigation = useNavigation();
   const today = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(today);
@@ -28,6 +28,13 @@ const BookDoctorAppointment = ({ route }) => {
   }, []);
 
   useEffect(() => {
+    if (service) {
+      // console.log('Setting initial service:', service);
+      setSelectedService(service);
+    }
+  }, [service]);
+
+  useEffect(() => {
     if (doctor?.doctorId) {
       axios
         .get(`https://api.unime.site/UNIME/doctorservice/get/serviceList/${doctor.doctorId}`)
@@ -36,7 +43,7 @@ const BookDoctorAppointment = ({ route }) => {
           if (Array.isArray(services)) {
             setServiceList(services);
             setFilteredServices(services);
-            if (services.length > 0) {
+            if (!service && services.length > 0) {
               setSelectedService(services[0]);
             }
           } else {
@@ -53,10 +60,10 @@ const BookDoctorAppointment = ({ route }) => {
     if (selectedDate && doctorTimeWork.length > 0) {
       const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
       const selectedDay = days[new Date(selectedDate).getDay()];
-      
+
       const availableSlots = doctorTimeWork
-        .filter(slot => 
-          slot.dayOfWeek === selectedDay && 
+        .filter(slot =>
+          slot.dayOfWeek === selectedDay &&
           slot.doctorTimeworkStatus === "Available"
         )
         .map(slot => ({
@@ -98,16 +105,16 @@ const BookDoctorAppointment = ({ route }) => {
   const confirmAppointment = async () => {
     try {
       setIsLoading(true);
-      
+
       const selectedTimeSlot = timeSlots.find(slot => slot.time === selectedTime);
-      
+
       if (!selectedTimeSlot || !selectedService) {
         Alert.alert('Thông báo', 'Vui lòng chọn đầy đủ thông tin đặt lịch');
         return;
       }
       const tokenString = await AsyncStorage.getItem('userToken');
       const token = tokenString ? JSON.parse(tokenString) : null;
-      if (!token || !token.raw) { 
+      if (!token || !token.raw) {
         console.log("Token không tồn tại");
         Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
         return;
@@ -127,11 +134,11 @@ const BookDoctorAppointment = ({ route }) => {
       );
 
       if (response.data.code === 1000) {
-        navigation.navigate('appointment success', { 
-          doctorDetails, 
-          date: selectedDate, 
-          time: selectedTime, 
-          selectedService, 
+        navigation.navigate('appointment success', {
+          doctorDetails,
+          date: selectedDate,
+          time: selectedTime,
+          selectedService,
         });
       } else {
         Alert.alert('Thông báo', 'Đặt lịch không thành công');
@@ -200,16 +207,28 @@ const BookDoctorAppointment = ({ route }) => {
       <Picker
         selectedValue={selectedService?.serviceId}
         onValueChange={(itemValue) => {
-          const selected = filteredServices.find(service => service.serviceId === itemValue);
-          setSelectedService(selected);
+          if (!service) {
+            // console.log('ItemValue:', itemValue);
+            // console.log('FilteredServices:', filteredServices);
+            const selected = filteredServices.find(srv => {
+              // console.log('Comparing:', srv.serviceId, itemValue);
+              return Number(srv.serviceId) === Number(itemValue);
+            });
+            // console.log('Selected service:', selected);
+            setSelectedService(selected);
+          }
         }}
-        style={styles.picker}
+        style={[
+          styles.picker,
+          service && styles.disabledPicker
+        ]}
+        enabled={!service}
       >
-        {filteredServices.map(service => (
+        {filteredServices.map(srv => (
           <Picker.Item 
-            key={service.serviceId} 
-            label={`${service.serviceName}`} 
-            value={service.serviceId} 
+            key={srv.serviceId} 
+            label={`${srv.serviceName}`} 
+            value={Number(srv.serviceId)} 
           />
         ))}
       </Picker>
@@ -309,6 +328,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom: 20,
+  },
+  disabledPicker: {
+    opacity: 0.8,
+    backgroundColor: '#f5f5f5',
+    borderColor: '#ccc',
+    borderStyle: 'dashed', 
+    color: '#666',          
   },
   priceLabel: {
     fontSize: 18,

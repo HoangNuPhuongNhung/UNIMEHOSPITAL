@@ -37,9 +37,9 @@ export default function App() {
             <StackNavigator.Screen name="CreatePassword" component={CreatePasswordPage} options={{ headerShown: false }} />
             <StackNavigator.Screen name="bottom tab" component={BottomTab} options={{ headerShown: false }} />
             <StackNavigator.Screen name="change password" component={ChangePasswordPage} options={{ title: 'Hồ sơ' }} />
-            <StackNavigator.Screen name="DoctorDetailPage" component={DoctorDetailPage} options={{ title: 'Danh sách bác sĩ' }} />
-            <StackNavigator.Screen name="book doctor" component={BookDoctorAppointment} options={{ title: 'Thông tin bác sĩ' }} />
-            <StackNavigator.Screen name="appointment success" component={AppointmentSuccessPage} options={{ title: 'Đặt lịch' }} />
+            <StackNavigator.Screen name="DoctorDetailPage" component={DoctorDetailPage} options={{ title: 'Thông tin bác sĩ' }} />
+            <StackNavigator.Screen name="book doctor" component={BookDoctorAppointment} options={{ title: 'Đặt lịch khám' }} />
+            <StackNavigator.Screen name="appointment success" component={AppointmentSuccessPage} options={{ title: 'Đặt lịch khám' }} />
             <StackNavigator.Screen name="UserInfo" component={UserInfoPage} options={{ title: 'Thông tin cá nhân' }} />
             <StackNavigator.Screen name="ForgotPw" component={ForgotPwPage} options={{ headerShown: false }} />
             <StackNavigator.Screen name="DoctorByServicePage" component={DoctorByServicePage} options={{ title: 'Danh sách bác sĩ' }} />
