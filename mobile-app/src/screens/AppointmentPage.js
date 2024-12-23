@@ -1,66 +1,119 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import axios from 'axios'; // Import thư viện Axios
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const appointments = [
-  {
-    id: 1,
-    date: '01/10/2024',
-    time: '10:30-11:00',
-    service: 'Khám bệnh',
-    doctorName: 'Nguyễn Lân Việt',
-    specialty: 'Tim mạch',
-  },
-  {
-    id: 2,
-    date: '01/10/2024',
-    time: '10:30-11:00',
-    service: 'Khám bệnh',
-    doctorName: 'Nguyễn Lân Việt',
-    specialty: 'Tim mạch',
-  },
-  {
-    id: 3,
-    date: '01/10/2024',
-    time: '10:30-11:00',
-    service: 'Khám bệnh',
-    doctorName: 'Nguyễn Lân Việt',
-    specialty: 'Tim mạch',
-  },
-];
 
-const AppointmentCard = ({ appointment }) => (
-  <View style={styles.card}>
-    <View style={styles.infoRow}>
-      <Text style={styles.value}>{appointment.date}</Text>
-      <Text style={styles.value}>{appointment.time}</Text>
-      <Text style={styles.value}>{appointment.service}</Text>
-    </View>
-    <View style={styles.infoRow}>
-      <Text style={styles.label}>Bác sĩ</Text>
-      <Text style={styles.doctorName}>{appointment.doctorName}</Text>
-    </View>
-    <View style={styles.infoRow}>
-      <Text style={styles.label}>Chuyên khoa</Text>
-      <Text style={styles.specialty}>{appointment.specialty}</Text>
+
+const getCurrentWeekDate = (dayOfWeek) => {
+  const weekDayMap = {
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
+    sunday: 0,
+  };
+
+  const today = new Date();
+  const currentDay = today.getDay(); // Ngày hiện tại (0 = Chủ Nhật, 1 = Thứ Hai, ...)
+  const targetDay = weekDayMap[dayOfWeek.toLowerCase()];
+
+  // Tính toán ngày cần tìm (cộng khoảng cách ngày)
+  const diff = targetDay - currentDay;
+  const targetDate = new Date(today); 
+  targetDate.setDate(today.getDate() + diff);
+
+  // Định dạng ngày: DD/MM/YYYY
+  return targetDate.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+};
+const AppointmentCard = ({ appointment }) => {
+  // Tính ngày thực tế từ `dayOfWeek`
+  const formattedDate = getCurrentWeekDate(appointment.dayOfWeek);
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.infoRow}>
+        {/* Hiển thị ngày thực tế */}
+        <Text style={styles.value}>{formattedDate}</Text>
+        <Text style={styles.value}>
+          {appointment.startTime} - {appointment.endTime}
+        </Text>
+        <Text style={styles.value}>{appointment.serviceName}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>Bác sĩ:</Text>
+        <Text style={styles.doctorName}>{appointment.doctorName}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>Trạng thái:</Text>
+        <Text style={styles.specialty}>{appointment.appointmentStatus}</Text>
+      </View>
       <TouchableOpacity style={styles.cancelButton}>
         <Text style={styles.cancelButtonText}>Hủy</Text>
       </TouchableOpacity>
     </View>
-  </View>
-);
-
+  );
+};
 const AppointmentList = () => {
-  return (
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        // Lấy token từ AsyncStorage
+        const tokenString = await AsyncStorage.getItem('userToken');
+        const token = tokenString ? JSON.parse(tokenString) : null;
+
+        if (!token) {
+          console.error('Token is missing or invalid!');
+          return;
+        }
+
+        // Gọi API để lấy danh sách lịch hẹn
+        const response = await axios.get(
+          'https://api.unime.site/UNIME/appointments/getByPatient',
+          {
+            headers: {
+              Authorization: `Bearer ${token.raw}`,
+            },
+          }
+        );
+
+        if (response.data && response.data.result) {
+          setAppointments(response.data.result); // Cập nhật danh sách lịch hẹn
+        } else {
+          console.error('Invalid API response format.');
+        }
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      } finally {
+        setLoading(false); // Dừng trạng thái loading
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  return (
     <ImageBackground
-      source={require('../../assets/background.png')} 
+      source={require('../../assets/background.png')}
       style={styles.background}
-      resizeMode=""
     >
       <ScrollView style={styles.container}>
-      {appointments.map((appointment) => (
-        <AppointmentCard key={appointment.id} appointment={appointment} />
-      ))}
+        {loading ? (
+          <Text>Đang tải dữ liệu...</Text>
+        ) : (
+          appointments.map((appointment) => (
+            <AppointmentCard key={appointment.appointmentId} appointment={appointment} />
+          ))
+        )}
       </ScrollView>
     </ImageBackground>
   );
@@ -69,7 +122,7 @@ const AppointmentList = () => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover', 
+    resizeMode: 'cover',
   },
   container: {
     flex: 1,
@@ -114,6 +167,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5C5C',
     padding: 10,
     borderRadius: 5,
+    alignSelf: 'flex-end',
   },
   cancelButtonText: {
     color: '#fff',

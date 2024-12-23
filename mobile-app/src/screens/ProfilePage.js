@@ -54,7 +54,7 @@ const ProfilePage = ({ route }) => {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('UserInfo')}>
           <Text style={styles.buttonText}>Thông tin cá nhân</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AppointmentPage')}>
           <Text style={styles.buttonText}>Hồ sơ đặt lịch</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button}>

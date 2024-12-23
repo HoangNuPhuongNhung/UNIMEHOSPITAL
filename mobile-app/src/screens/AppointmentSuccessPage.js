@@ -7,8 +7,8 @@ const AppointmentSuccessPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { doctorDetails, date, time, selectedService, service } = route.params;
-  console.log( doctorDetails, date, time, selectedService, service.serviceId);
+  const { doctorDetails, date, time, selectedService } = route.params;
+  // console.log( doctorDetails, date, time, selectedService, service.serviceId);
   return (
     <View style={styles.container}>
 

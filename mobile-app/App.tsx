@@ -16,7 +16,7 @@ import ChangePasswordPage from './src/screens/ChangePasswordPage';
 import DoctorDetailPage from './src/screens/DoctorDetailPage';
 import BookDoctorAppointment from './src/screens/BookDoctorAppointment';
 import AppointmentSuccessPage from './src/screens/AppointmentSuccessPage';
-
+import AppointmentPage from './src/screens/AppointmentPage';
 import BottomTab from './src/navigations/BottomTab';
 import { createStackNavigator } from '@react-navigation/stack';
 import UserInfoPage from './src/screens/UserInfoPage';
@@ -124,6 +124,7 @@ export default function App() {
             <StackNavigator.Screen name="UserInfo" component={UserInfoPage} options={{ title: 'Thông tin cá nhân' }} />
             <StackNavigator.Screen name="ForgotPw" component={ForgotPwPage} options={{ headerShown: false }} />
             <StackNavigator.Screen name="DoctorByServicePage" component={DoctorByServicePage} options={{ title: 'Danh sách bác sĩ' }} />
+            <StackNavigator.Screen name="AppointmentPage" component={AppointmentPage} options={{ title: 'Lịch khám' }} />
             <StackNavigator.Screen 
               name="WebView" 
               component={WebViewScreen} 
