@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
 import axios from 'axios'; // Import thư viện Axios
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
+
 
 
 
@@ -67,7 +69,6 @@ const AppointmentList = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        // Lấy token từ AsyncStorage
         const tokenString = await AsyncStorage.getItem('userToken');
         const token = tokenString ? JSON.parse(tokenString) : null;
 
@@ -75,8 +76,6 @@ const AppointmentList = () => {
           console.error('Token is missing or invalid!');
           return;
         }
-
-        // Gọi API để lấy danh sách lịch hẹn
         const response = await axios.get(
           'https://api.unime.site/UNIME/appointments/getByPatient',
           {
@@ -87,14 +86,14 @@ const AppointmentList = () => {
         );
 
         if (response.data && response.data.result) {
-          setAppointments(response.data.result); // Cập nhật danh sách lịch hẹn
+          setAppointments(response.data.result);
         } else {
           console.error('Invalid API response format.');
         }
       } catch (error) {
         console.error('Error fetching appointments:', error);
       } finally {
-        setLoading(false); // Dừng trạng thái loading
+        setLoading(false);
       }
     };
 
