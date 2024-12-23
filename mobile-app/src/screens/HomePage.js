@@ -1,12 +1,12 @@
-import React, { useEffect, useState,useContext } from 'react';
-import { View, Text, FlatList, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import React, { useEffect, useState, useContext, useRef } from 'react';
+import { View, Text, FlatList, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackground, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AntDesign } from '@expo/vector-icons';
-// import { Path, SvgUri } from "react-native-svg";
-// import Svg, { Circle } from 'react-native-svg';
 import { Path, Svg, Circle } from "react-native-svg";
 import { UserContext } from '../contexts/UserContext';
-
+import axios from 'axios';
+import { XMLParser } from 'fast-xml-parser';
+import { useNavigation } from '@react-navigation/native';
 const appointments = [
   { id: 1, title: 'Tâm lý', place: 'Phòng khám Saigon', date: '25 Sep', time: '10:30am', icon: 'account' },
   { id: 2, title: 'Tiêu hóa', place: 'Bệnh viện chợ rẫy', date: '26 Sep', time: '10:30am', icon: 'account' },
@@ -14,20 +14,29 @@ const appointments = [
   { id: 4, title: 'Tiêu hóa', place: 'Bệnh viện chợ rẫy', date: '26 Sep', time: '10:30am', icon: 'account' },
 ];
 
-const categories = [
-  { name: 'Tim', icon: require('../../assets/specialty/heart.png') },
-  { name: 'Nha khoa', icon: require('../../assets/specialty/tooth.png') },
-  { name: 'Thận', icon: require('../../assets/specialty/kidney.png') },
-  { name: 'Dạ dày', icon: require('../../assets/specialty/stomach.png') },
-  { name: 'Phổi', icon: require('../../assets/specialty/lungs.png') },
-  { name: 'Nhi Khoa', icon: require('../../assets/specialty/child.png') },
-];
+// const categories = [
+//   { name: 'Tim', icon: require('../../assets/specialty/heart.png') },
+//   { name: 'Nha khoa', icon: require('../../assets/specialty/tooth.png') },
+//   { name: 'Thận', icon: require('../../assets/specialty/kidney.png') },
+//   { name: 'Dạ dày', icon: require('../../assets/specialty/stomach.png') },
+//   { name: 'Phổi', icon: require('../../assets/specialty/lungs.png') },
+//   { name: 'Nhi Khoa', icon: require('../../assets/specialty/child.png') },
+// ];
 
 
 const HomePage = () => {
   const { userInfo, updateUserInfo } = useContext(UserContext);
   const [greeting, setGreeting] = useState('');
+  const [rssArticles, setRssArticles] = useState([]);
+  const [visibleItems, setVisibleItems] = useState(5);
+  const navigation = useNavigation();
+  const listRef = useRef(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
+  useEffect(() => {
+    setGreeting(getGreeting());
+    fetchRSS();
+  }, []);
 
   const getGreeting = () => {
     const currentHour = new Date().getHours();
@@ -35,7 +44,57 @@ const HomePage = () => {
     else if (currentHour < 18) return 'Chào buổi chiều!';
     else return 'Chào buổi tối!';
   };
+  const fetchRSS = async () => {
+    try {
+      const response = await axios.get('https://vnexpress.net/rss/suc-khoe.rss', {
+        headers: {
+          'Content-Type': 'application/xml',
+        },
+      });
+      
+      const rssText = response.data;
+      const parser = new XMLParser();
+      const rssData = parser.parse(rssText);
+      const articles = rssData?.rss?.channel?.item || [];
+      
+      setRssArticles(articles);
+    } catch (error) {
+      console.error('Error fetching RSS feed with axios:', error);
+    }
+  };
 
+  const renderArticle = ({ item }) => {
+    const getImageUrl = (description) => {
+      const match = description.match(/<img.*?src="(.*?)"/);
+      return match ? match[1] : null;
+    };
+
+    const imageUrl = getImageUrl(item.description);
+    const cleanDescription = item.description.replace(/<[^>]+>/g, '');
+
+    const handlePress = () => {
+      navigation.navigate('WebView', { url: item.link });
+    };
+
+    return (
+      <TouchableOpacity
+        style={styles.rssCard}
+        onPress={handlePress}
+      >
+        {imageUrl && (
+          <Image
+            source={{ uri: imageUrl }}
+            style={styles.articleImage}
+            resizeMode="cover"
+          />
+        )}
+        <Text style={styles.articleTitle}>{item.title}</Text>
+        <Text numberOfLines={2} style={styles.articleDescription}>
+          {cleanDescription}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.appointmentCard}>
@@ -51,62 +110,94 @@ const HomePage = () => {
     </View>
   );
 
+  const loadMore = () => {
+    setVisibleItems(prevItems => Math.min(prevItems + 5, rssArticles.length));
+  };
+
+  const displayedArticles = rssArticles.slice(0, visibleItems);
+
+  const handleScroll = (event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    // console.log('Scroll position:', offsetY);
+    if (offsetY > 200) {
+      setShowScrollTop(true);
+    } else {
+      setShowScrollTop(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
+
   return (
     <ImageBackground source={require('../../assets/background.png')} style={styles.background}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              style={styles.logo}
-              source={{ uri: userInfo?.patientImage }}
-            />
-            <View style={{ marginLeft: 10 }}>
-              <Text style={{ fontSize: 20, fontWeight: '600' }}>{userInfo?.patientName}</Text>
-              <Text>{greeting} </Text>
+      <FlatList
+        ref={listRef}
+        data={[{ key: 'content' }]}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        renderItem={() => (
+          <>
+            <View style={styles.container}>
+              <View style={styles.welcomeContainer}>
+                <Image
+                  style={styles.logo}
+                  source={{ uri: userInfo?.patientImage }}
+                />
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={{ fontSize: 20, fontWeight: '600' }}>{userInfo?.patientName}</Text>
+                  <Text style={{ fontSize: 16, color: '#666' }}>{greeting}</Text>
+                </View>
+              </View>
             </View>
-            {/* <View style={styles.bellIcon}>
-              <Svg viewBox="0 0 24 24" >
-                  <Path
-                    d="M18.7491 9.70957V9.00497C18.7491 5.13623 15.7274 2 12 2C8.27256 2 5.25087 5.13623 5.25087 9.00497V9.70957C5.25087 10.5552 5.00972 11.3818 4.5578 12.0854L3.45036 13.8095C2.43882 15.3843 3.21105 17.5249 4.97036 18.0229C9.57274 19.3257 14.4273 19.3257 19.0296 18.0229C20.789 17.5249 21.5612 15.3843 20.5496 13.8095L19.4422 12.0854C18.9903 11.3818 18.7491 10.5552 18.7491 9.70957Z"
-                    stroke="#2b6fce"
-                    strokeWidth=".5"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-              </Svg>
-            </View> */}
 
+            <View style={styles.container}>
+              <Text style={styles.header}>Lịch hẹn sắp tới</Text>
+              <View style={styles.appointmentContainer}>
+                <FlatList
+                  data={appointments}
+                  renderItem={renderItem}
+                  keyExtractor={item => item.id.toString()}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  nestedScrollEnabled
+                />
+              </View>
+            </View>
 
-          </View>
-        </View>
-
-
-        <View style={styles.container}>
-          <Text style={styles.header}>Lịch hẹn sắp tới</Text>
-          <View style={styles.appointmentContainer}>
-            <FlatList
-              data={appointments}
-              renderItem={renderItem}
-              keyExtractor={item => item.id.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            />
-          </View>
-        </View>
-
-        <View style={styles.container}>
-          <Text style={styles.header}>Danh mục</Text>
-          <View style={styles.categoryContainer}>
-            {categories.map((category) => (
-              <TouchableOpacity key={category.name} style={styles.categoryCard}>
-                <Image source={category.icon} style={{ width: 30, height: 30 }} />
-                <Text style={styles.categoryText}>{category.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </ScrollView>
+            <View style={styles.container}>
+              <Text style={styles.header}>Bài báo sức khỏe</Text>
+              {displayedArticles.map((item, index) => (
+                <View key={item.link || index.toString()}>
+                  {renderArticle({ item, index })}
+                </View>
+              ))}
+              {visibleItems < rssArticles.length && (
+                <TouchableOpacity 
+                  style={styles.viewMoreButton}
+                  onPress={loadMore}
+                >
+                  <Text style={styles.viewMoreText}>
+                    Xem thêm
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </>
+        )}
+        contentContainerStyle={styles.scrollContainer}
+      />
+      
+      {showScrollTop && (
+        <TouchableOpacity 
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+          activeOpacity={0.8}
+        >
+          <AntDesign name="arrowup" size={24} color="black" />
+        </TouchableOpacity>
+      )}
     </ImageBackground>
   );
 };
@@ -209,6 +300,65 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#4D9DE0',
+  },
+  rssCard: {
+    padding: 15,
+    marginVertical: 8,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  articleTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  articleDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+  articleImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  viewMoreButton: {
+    padding: 10,
+    alignItems: 'center',
+    backgroundColor: '#4D9DE0',
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  viewMoreText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  scrollTopButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    backgroundColor: '#4D9DE0',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 9999,
   },
 });
 

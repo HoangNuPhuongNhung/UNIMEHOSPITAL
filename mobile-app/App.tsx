@@ -22,6 +22,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import UserInfoPage from './src/screens/UserInfoPage';
 import ForgotPwPage from './src/screens/ForgotPasswordPage';
 import DoctorByServicePage from './src/screens/DoctorByServicePage';
+import WebViewScreen from './src/screens/WebViewScreen';
 const StackNavigator = createStackNavigator();
 
 const toastConfig = {
@@ -30,17 +31,17 @@ const toastConfig = {
       {...props}
       style={{
         borderLeftColor: 'green',
-        width: '90%',  // Tăng độ rộng
+        width: '90%',  
       }}
       contentContainerStyle={{
         paddingHorizontal: 15,
       }}
       text1Style={{
-        fontSize: 16,   // Tăng kích thước chữ tiêu đề
+        fontSize: 16,   
         fontWeight: 'bold'
       }}
       text2Style={{
-        fontSize: 14    // Tăng kích thước chữ nội dung
+        fontSize: 14   
       }}
     />
   ),
@@ -49,17 +50,17 @@ const toastConfig = {
       {...props}
       style={{
         borderLeftColor: 'red',
-        width: '90%',   // Tăng độ rộng
+        width: '90%',   
       }}
       contentContainerStyle={{
         paddingHorizontal: 15,
       }}
       text1Style={{
-        fontSize: 16,   // Tăng kích thước chữ tiêu đề
+        fontSize: 16,  
         fontWeight: 'bold'
       }}
       text2Style={{
-        fontSize: 16    // Tăng kích thước chữ nội dung
+        fontSize: 14    
       }}
     />
   ),
@@ -67,7 +68,7 @@ const toastConfig = {
     <BaseToast
       {...props}
       style={{
-        borderLeftColor: '#1E90FF',  // Màu xanh dương
+        borderLeftColor: '#1E90FF',  
         width: '90%',
       }}
       contentContainerStyle={{
@@ -86,7 +87,7 @@ const toastConfig = {
     <BaseToast
       {...props}
       style={{
-        borderLeftColor: '#FFA500',  // Màu cam
+        borderLeftColor: '#FFA500',  
         width: '90%',
       }}
       contentContainerStyle={{
@@ -123,6 +124,14 @@ export default function App() {
             <StackNavigator.Screen name="UserInfo" component={UserInfoPage} options={{ title: 'Thông tin cá nhân' }} />
             <StackNavigator.Screen name="ForgotPw" component={ForgotPwPage} options={{ headerShown: false }} />
             <StackNavigator.Screen name="DoctorByServicePage" component={DoctorByServicePage} options={{ title: 'Danh sách bác sĩ' }} />
+            <StackNavigator.Screen 
+              name="WebView" 
+              component={WebViewScreen} 
+              options={{ 
+                headerShown: true,
+                title: 'Bài viết'
+              }} 
+            />
           </StackNavigator.Navigator>
         </NavigationContainer>
         <Toast config={toastConfig}/>
