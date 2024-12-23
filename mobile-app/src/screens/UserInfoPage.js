@@ -5,6 +5,7 @@ import { getToken } from '../services/authService';
 import { selectAndUploadImage } from '../services/imageService';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
+import Toast from 'react-native-toast-message';
 const UserInfoPage = () => {
     const { userInfo, updateUserInfo } = useContext(UserContext);
 
@@ -24,13 +25,34 @@ const UserInfoPage = () => {
             const uploadedUrl = await selectAndUploadImage(); // Chọn và upload ảnh
             if (uploadedUrl) {
                 setImage(uploadedUrl); // Lưu URL vào state
-                Alert.alert('Thành công', 'Ảnh đã được tải lên!');
+                // Alert.alert('Thành công', 'Ảnh đã được tải lên!');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Thành công',
+                    text2: 'Ảnh đã được tải lên!',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             } else {
-                Alert.alert('Lỗi', 'Không thể tải ảnh lên!');
+                // Alert.alert('Lỗi', 'Không thể tải ảnh lên!');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Lỗi',
+                    text2: 'Không thể tải ảnh lên!',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             }
         } catch (error) {
             console.error('Error selecting/uploading image:', error);
-            Alert.alert('Lỗi', 'Đã xảy ra lỗi khi chọn hoặc tải ảnh!');
+            // Alert.alert('Lỗi', 'Đã xảy ra lỗi khi chọn hoặc tải ảnh!');
+            Toast.show({
+                type: 'error',
+                text1: 'Lỗi',
+                text2: 'Đã xảy ra lỗi khi chọn hoặc tải ảnh!',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -61,7 +83,14 @@ const UserInfoPage = () => {
                 gender === (userInfo?.patientGender ? 'male' : 'female') &&
                 image === userInfo?.patientImage
             ) {
-                Alert.alert('Thông báo', 'Không có thay đổi nào để cập nhật!');
+                // Alert.alert('Thông báo', 'Không có thay đổi nào để cập nhật!');
+                Toast.show({
+                    type: 'warning',
+                    text1: 'Thông báo',
+                    text2: 'Không có thay đổi nào để cập nhật!',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
                 return;
             }
 
@@ -94,14 +123,35 @@ const UserInfoPage = () => {
 
             if (response.status === 200) {
                 updateUserInfo(payload);
-                Alert.alert('Thành công', 'Cập nhật thông tin thành công!');
+                // Alert.alert('Thành công', 'Cập nhật thông tin thành công!');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Thành công',
+                    text2: 'Cập nhật thông tin thành công!',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             } else {
                 const error = await response.json();
-                Alert.alert('Thất bại', error?.message || 'Đã xảy ra lỗi!');
+                // Alert.alert('Thất bại', error?.message || 'Đã xảy ra lỗi!');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Thất bại',
+                    text2: error?.message || 'Đã xảy ra lỗi!',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             }
         } catch (error) {
             console.error('API Error:', error);
-            Alert.alert('Lỗi', 'Không thể cập nhật thông tin!');
+            // Alert.alert('Lỗi', 'Không thể cập nhật thông tin!');
+            Toast.show({
+                type: 'error',
+                text1: 'Lỗi',
+                text2: 'Không thể cập nhật thông tin!',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
     return (
@@ -111,7 +161,6 @@ const UserInfoPage = () => {
                     source={{ uri: image || userInfo?.patientImage }}
                     style={styles.avatar}
                 />
-                <Text style={styles.editAvatar}>🖊️</Text>
             </TouchableOpacity>
 
             <View style={styles.inputGroup}>

@@ -87,8 +87,11 @@ const DoctorListPage = () => {
         <View style={styles.filterContainer}>
           <Text style={styles.label}>Chuyên khoa</Text>
           <View style={styles.dropdown}>
-            <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
-              <Text>{selectedDepartment}</Text>
+            <TouchableOpacity 
+              onPress={() => setShowDropdown(!showDropdown)}
+              style={styles.dropdownButton}
+            >
+              <Text style={styles.dropdownButtonText}>{selectedDepartment}</Text>
               <Icon name="arrow-drop-down" size={24} color="#333" />
             </TouchableOpacity>
             {showDropdown && (
@@ -187,6 +190,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
+    height: 50,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -281,6 +285,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     fontSize: 16,
+  },
+  dropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingVertical: 3,
+  },
+  dropdownButtonText: {
+    fontSize: 15,
   },
 });
 

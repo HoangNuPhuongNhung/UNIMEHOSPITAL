@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, A
 import { AuthContext } from '../contexts/AuthContext'
 import {getUserInfo} from '../services/authService'
 import { UserContext } from '../contexts/UserContext';
+import Toast from 'react-native-toast-message';
 const LoginPage = ({ navigation }) => {
   const { login, loading } = useContext(AuthContext);
   const {userInfo, updateUserInfo} = useContext(UserContext);
@@ -17,17 +18,37 @@ const LoginPage = ({ navigation }) => {
 
   const handleLogin = async() => {
     if (!username) {
-      Alert.alert('Lỗi', 'Tên đăng nhập không được để trống!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Tên đăng nhập không được để trống!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
     if (username.includes(' ')) {
-      Alert.alert('Lỗi', 'Tên đăng nhập không được chứa dấu cách!');
+      // Alert.alert('Lỗi', 'Tên đăng nhập không được chứa dấu cách!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Tên đăng nhập không được chứa dấu cách!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
     if (!password) {
-      Alert.alert('Lỗi', 'Mật khẩu không được để trống!');
+      // Alert.alert('Lỗi', 'Mật khẩu không được để trống!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Mật khẩu không được để trống!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
@@ -44,13 +65,27 @@ const LoginPage = ({ navigation }) => {
     try {
     const isSuccess = await login(username, password); // Gọi hàm login
     if (isSuccess) {
-      Alert.alert('Thành công', 'Đăng nhập thành công');
+      // Alert.alert('Thành công', 'Đăng nhập thành công');
+      Toast.show({
+        type: 'success',
+        text1: 'Thành công',
+        text2: 'Đăng nhập thành công!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       const data = await getUserInfo();
       updateUserInfo(data);
       navigation.navigate('bottom tab'); // Điều hướng 
     }
     } catch (error) {
-      Alert.alert('Lỗi', error.message || 'Tên đăng nhập hoặc mật khẩu không chính xác!');
+      // Alert.alert('Lỗi', error.message || 'Tên đăng nhập hoặc mật khẩu không chính xác!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: error.message || 'Tên đăng nhập hoặc mật khẩu không chính xác!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 

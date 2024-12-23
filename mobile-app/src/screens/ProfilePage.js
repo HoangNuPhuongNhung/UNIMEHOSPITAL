@@ -49,11 +49,13 @@ const ProfilePage = ({ route }) => {
             <Text style={styles.detail}>{userInfo?.patientDateOfBirth}</Text>
             <Text style={styles.detail}>{userInfo?.patientPhoneNumber}</Text>
           </View>
-          <Icon name="pencil" size={24} color="#4D9DE0" style={styles.editIcon} />
         </View>
 
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('UserInfo')}>
           <Text style={styles.buttonText}>Thông tin cá nhân</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Hồ sơ đặt lịch</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Cài đặt tài khoản</Text>

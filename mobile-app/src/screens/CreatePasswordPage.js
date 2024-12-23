@@ -59,22 +59,50 @@ const CreatePasswordPage = ({ route, navigation }) => {
     const passwordError = validatePassword(password);
 
     if (!username) {
-      Alert.alert('Lỗi', 'Vui lòng nhập tên đăng nhập.');
+      // Alert.alert('Lỗi', 'Vui lòng nhập tên đăng nhập.');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Vui lòng nhập tên đăng nhập.',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
     if (passwordError) {
-      Alert.alert('Lỗi mật khẩu', passwordError);
+      // Alert.alert('Lỗi mật khẩu', passwordError);
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Mật khẩu phải có ít nhất 6 ký tự!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu không khớp!');
+      // Alert.alert('Lỗi', 'Mật khẩu không khớp!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Mật khẩu không khớp!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
     if (!name || !address || !phoneNumber || !dateOfBirth) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin!');
+      // Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Vui lòng điền đầy đủ thông tin!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
@@ -106,9 +134,14 @@ const CreatePasswordPage = ({ route, navigation }) => {
     console.log('Response:', response.data); // Log response
 
     if (response.data.code === 1000) {
-      Alert.alert('Thành công', 'Đăng ký tài khoản thành công!', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') },
-      ]);
+      Toast.show({
+        type: 'success',
+        text1: 'Thành công',
+        text2: 'Đăng ký tài khoản thành công!',
+        visibilityTime: 2000,
+        autoHide: true,
+        onHide: () => navigation.navigate('Login')
+      });
     } else {
       Alert.alert('Lỗi', `Đăng ký thất bại: ${response.data.message || 'Vui lòng thử lại'}`);
     }

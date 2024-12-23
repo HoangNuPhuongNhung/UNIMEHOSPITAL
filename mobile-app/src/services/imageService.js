@@ -48,7 +48,14 @@ export const selectAndUploadImage = async () => {
   try {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      alert('Ứng dụng cần quyền truy cập thư viện ảnh!');
+      // alert('Ứng dụng cần quyền truy cập thư viện ảnh!');
+      Toast.show({
+        type: 'warning',
+        text1: 'Lỗi',
+        text2: 'Ứng dụng cần quyền truy cập thư viện ảnh!',
+        visibilityTime: 2000,
+        autoHide: true,
+    });
       return null;
     }
 

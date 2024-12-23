@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, Plat
 import { Ionicons } from '@expo/vector-icons'; 
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import Toast from 'react-native-toast-message';
 export default function ChangePasswordScreen() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -20,28 +20,63 @@ export default function ChangePasswordScreen() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu không được để trống!');
+      // Alert.alert('Lỗi', 'Mật khẩu không được để trống!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Mật khẩu không được để trống!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
     if (newPassword.length < 6) {
-      Alert.alert('Lỗi', 'Mật khẩu mới phải có ít nhất 6 ký tự!');
+      // Alert.alert('Lỗi', 'Mật khẩu mới phải có ít nhất 6 ký tự!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Mật khẩu mới phải có ít nhất 6 ký tự!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
     if (newPassword !== confirmPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp!');
+      // Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Mật khẩu xác nhận không khớp!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
 
     if (currentPassword === newPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu mới không được trùng với mật khẩu hiện tại!');
+      // Alert.alert('Lỗi', 'Mật khẩu mới không được trùng với mật khẩu hiện tại!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Mật khẩu mới không được trùng với mật khẩu hiện tại!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
     const tokenString = await AsyncStorage.getItem('userToken');
     const token = tokenString ? JSON.parse(tokenString) : null;
     if (!token || !token.raw) { 
       console.log("Token không tồn tại");
-      Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
+      // Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Bạn chưa đăng nhập, vui lòng đăng nhập lại.',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       return;
     }
     console.log(token);
@@ -63,15 +98,36 @@ export default function ChangePasswordScreen() {
       );
 
       if (response.data.code !== 1000) {
-        Alert.alert('Lỗi', 'Mật khẩu hiện tại không đúng!');
+        // Alert.alert('Lỗi', 'Mật khẩu hiện tại không đúng!');
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: 'Mật khẩu hiện tại không đúng!',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
         return;
       }
 
-      Alert.alert('Thành công', 'Mật khẩu đã được đổi thành công!');
+      // Alert.alert('Thành công', 'Mật khẩu đã được đổi thành công!');
+      Toast.show({
+        type: 'success',
+        text1: 'Thành công',
+        text2: 'Mật khẩu đã được đổi thành công!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
       resetForm();
     } catch (error) {
       console.error('Error changing password:', error);
-      Alert.alert('Lỗi', 'Đã xảy ra lỗi, vui lòng thử lại sau.');
+      // Alert.alert('Lỗi', 'Đã xảy ra lỗi, vui lòng thử lại sau.');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Đã xảy ra lỗi, vui lòng thử lại sau.',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 

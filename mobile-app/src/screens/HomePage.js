@@ -64,7 +64,6 @@ const HomePage = () => {
               <Text style={{ fontSize: 20, fontWeight: '600' }}>{userInfo?.patientName}</Text>
               <Text>{greeting} </Text>
             </View>
-            <AntDesign name="bells" size={22} color='#4c9de0' style={styles.bellIcon} />
             {/* <View style={styles.bellIcon}>
               <Svg viewBox="0 0 24 24" >
                   <Path

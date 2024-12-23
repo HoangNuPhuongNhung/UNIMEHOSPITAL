@@ -2,6 +2,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import Toast, { BaseToast, ToastProps } from 'react-native-toast-message';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { UserProvider } from './src/contexts/UserContext';
 import StartPage from './src/screens/StartPage';
@@ -23,6 +24,85 @@ import ForgotPwPage from './src/screens/ForgotPasswordPage';
 import DoctorByServicePage from './src/screens/DoctorByServicePage';
 const StackNavigator = createStackNavigator();
 
+const toastConfig = {
+  success: (props: ToastProps) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: 'green',
+        width: '90%',  // Tăng độ rộng
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+      }}
+      text1Style={{
+        fontSize: 16,   // Tăng kích thước chữ tiêu đề
+        fontWeight: 'bold'
+      }}
+      text2Style={{
+        fontSize: 14    // Tăng kích thước chữ nội dung
+      }}
+    />
+  ),
+  error: (props: ToastProps) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: 'red',
+        width: '90%',   // Tăng độ rộng
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+      }}
+      text1Style={{
+        fontSize: 16,   // Tăng kích thước chữ tiêu đề
+        fontWeight: 'bold'
+      }}
+      text2Style={{
+        fontSize: 16    // Tăng kích thước chữ nội dung
+      }}
+    />
+  ),
+  info: (props: ToastProps) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#1E90FF',  // Màu xanh dương
+        width: '90%',
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+      }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: 'bold'
+      }}
+      text2Style={{
+        fontSize: 14
+      }}
+    />
+  ),
+  warning: (props: ToastProps) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#FFA500',  // Màu cam
+        width: '90%',
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+      }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: 'bold'
+      }}
+      text2Style={{
+        fontSize: 14
+      }}
+    />
+  ),
+};
+  
 export default function App() {
   return (
     <UserProvider>
@@ -45,6 +125,7 @@ export default function App() {
             <StackNavigator.Screen name="DoctorByServicePage" component={DoctorByServicePage} options={{ title: 'Danh sách bác sĩ' }} />
           </StackNavigator.Navigator>
         </NavigationContainer>
+        <Toast config={toastConfig}/>
       </AuthProvider>
     </UserProvider>
   );
