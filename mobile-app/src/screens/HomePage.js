@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image,ScrollView, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AntDesign } from '@expo/vector-icons';
 import { UserContext } from '../contexts/UserContext';
@@ -110,7 +110,6 @@ const appointments = [
     
     const handleScroll = (event) => {
       const offsetY = event.nativeEvent.contentOffset.y;
-      // console.log('Scroll Offset:', offsetY);
   
        if (offsetY > 1000) {
           setShowScrollTop(true);
@@ -126,6 +125,7 @@ const appointments = [
     return (
         <View style={{ flex: 1 }}>
             <ImageBackground source={require('../../assets/background.png')} style={styles.background}>
+            <View style={styles.contentContainer}>
                 <FlatList
                     ref={listRef}
                     data={[{ key: 'content' }]}
@@ -192,6 +192,7 @@ const appointments = [
                         <AntDesign name="arrowup" size={24} color="white" />
                     </TouchableOpacity>
                 )}
+                </View>
             </ImageBackground>
         </View>
     );
@@ -215,6 +216,9 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
       paddingBottom: 100,
+    },
+    contentContainer: {
+      marginTop: 30
     },
     header: {
       fontSize: 20,
