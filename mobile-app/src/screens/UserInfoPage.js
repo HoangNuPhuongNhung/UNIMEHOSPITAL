@@ -1,11 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { getToken } from '../services/authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { selectAndUploadImage } from '../services/imageService';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { AuthContext } from '../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { refreshToken, checkValidToken } from '../services/tokenHelper';
 const UserInfoPage = () => {
     const { userInfo, updateUserInfo } = useContext(UserContext);
 
@@ -18,7 +21,8 @@ const UserInfoPage = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [date, setDate] = useState(new Date());
     const [image, setImage] = useState(userInfo?.patientImage || '');
-
+    const { logout } = useContext(AuthContext);
+    const navigation = useNavigation();
 
     const openImagePicker = async () => {
         try {
@@ -73,6 +77,26 @@ const UserInfoPage = () => {
         setShowPicker(true);
     };
 
+    const handleLogout = () => {
+        Alert.alert(
+            "Phiên đăng nhập hết hạn",
+            "Vui lòng đăng nhập lại!",
+            [
+                {
+                    text: "Hủy",
+                    style: "cancel"
+                },
+                {
+                    text: "Đồng ý", onPress: () => {
+                        logout();
+                        navigation.replace("Login");
+                    }
+                }
+            ],
+            { cancelable: true }
+        );
+    };
+
     const update = async () => {
         try {
             if (
@@ -94,8 +118,22 @@ const UserInfoPage = () => {
                 return;
             }
 
-            const token = await getToken();
-            console.log(token);
+            // const token = await getToken();
+            // console.log(token);
+            const tokenString = await AsyncStorage.getItem('userToken');
+            let token = tokenString ? JSON.parse(tokenString) : null;
+
+            if (!token || !token.raw) {
+                console.log("Token không tồn tại");
+                Toast.show({
+                    type: 'error',
+                    text1: 'Lỗi',
+                    text2: 'Bạn chưa đăng nhập, vui lòng đăng nhập lại.',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+                return;
+            }
             const payload = {
                 patientId: userInfo?.patientId,
                 userId: userInfo?.userId,
@@ -108,40 +146,74 @@ const UserInfoPage = () => {
                 patientGender: gender === 'male',
                 patientDateOfBirth: birthdate,
             };
+            const checkToken = await checkValidToken(token.raw);
+            if (checkToken) {
+                console.log('Token còn hạn!');
+                try {
+                    await axios.put(
+                        'https://api.unime.site/UNIME/patients/update',
+                        payload,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token.raw}`,
+                            },
+                        }
+                    );
 
-            const response = await axios.put(
-                'https://api.unime.site/UNIME/patients/update',
-                payload,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token.raw}`,
-                    },
+                } catch (error) {
+                    console.error('Lỗi cập nhật thông tin:', error);
+                    console.log('ahihi');
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Lỗi',
+                        text2: 'Đã xảy ra lỗi, vui lòng thử lại sau.',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    });
                 }
-            );
-    
-
-            if (response.status === 200) {
-                updateUserInfo(payload);
-                // Alert.alert('Thành công', 'Cập nhật thông tin thành công!');
-                Toast.show({
-                    type: 'success',
-                    text1: 'Thành công',
-                    text2: 'Cập nhật thông tin thành công!',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
             } else {
-                const error = await response.json();
-                // Alert.alert('Thất bại', error?.message || 'Đã xảy ra lỗi!');
-                Toast.show({
-                    type: 'error',
-                    text1: 'Thất bại',
-                    text2: error?.message || 'Đã xảy ra lỗi!',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
+                console.log('Token hết hạn ! Đợi làm mới');
+                const newToken = await refreshToken();
+                if (newToken) {
+                    token = { raw: newToken };
+                    try {
+                        await axios.put(
+                            'https://api.unime.site/UNIME/patients/update',
+                            payload,
+                            {
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${token.raw}`,
+                                },
+                            }
+                        );
+                    } catch (error) {
+                        console.error('Lỗi cập nhật thông tin:', error);
+                        console.log('ahihi');
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Lỗi',
+                            text2: 'Đã xảy ra lỗi, vui lòng thử lại sau.',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    }
+                }else {
+                    handleLogout();
+                    return;
+                }
             }
+            console.log('Đổi được thông tin rồi');
+            updateUserInfo(payload);
+            // Alert.alert('Thành công', 'Cập nhật thông tin thành công!');
+            Toast.show({
+                type: 'success',
+                text1: 'Thành công',
+                text2: 'Cập nhật thông tin thành công!',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         } catch (error) {
             console.error('API Error:', error);
             // Alert.alert('Lỗi', 'Không thể cập nhật thông tin!');

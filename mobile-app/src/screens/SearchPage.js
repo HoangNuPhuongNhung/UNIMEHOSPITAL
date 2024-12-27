@@ -43,7 +43,7 @@ const DoctorListPage = () => {
         response = await axios.get('https://api.unime.site/UNIME/doctors/get/doctorList');
       } else {
         // Fetch doctors by department
-        response = await axios.get(`http://api.unime.site:8888/UNIME/doctors/get/byDepartment?doctor_departmentId=${departmentId}`);
+        response = await axios.get(`https://api.unime.site/UNIME/doctors/get/byDepartment?doctor_departmentId=${departmentId}`);
       }
       
       if (response.data.code === 1000) {
@@ -132,6 +132,7 @@ const DoctorListPage = () => {
             <View style={styles.infoContainer}>
               <Text style={styles.doctorName}>{doctor.doctorName}</Text>
               <Text style={styles.hospital}>{doctor.doctorAddress}</Text>
+              <Text style={styles.departmentName}>Chuyên khoa: {doctor.departmentName}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={styles.button}
@@ -235,6 +236,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
   },
+  departmentName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#4D9DE0',
+    marginBottom: 5,
+  },
   specialty: {
     fontSize: 14,
     color: '#777',
@@ -243,7 +250,6 @@ const styles = StyleSheet.create({
   hospital: {
     fontSize: 14,
     color: '#777',
-    marginBottom: 10,
   },
   buttonContainer: {
     flexDirection: 'row',

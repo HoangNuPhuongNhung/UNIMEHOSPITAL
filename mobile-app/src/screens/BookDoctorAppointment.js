@@ -5,7 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import Toast from 'react-native-toast-message';
 const BookDoctorAppointment = ({ route }) => {
   const { doctor, service = null } = route.params;
   // console.log(service);
@@ -109,14 +109,28 @@ const BookDoctorAppointment = ({ route }) => {
       const selectedTimeSlot = timeSlots.find(slot => slot.time === selectedTime);
 
       if (!selectedTimeSlot || !selectedService) {
-        Alert.alert('Thông báo', 'Vui lòng chọn đầy đủ thông tin đặt lịch');
+        //Alert.alert('Thông báo', 'Vui lòng chọn đầy đủ thông tin đặt lịch');
+        Toast.show({
+          type: 'warning',
+          text1: 'Thông báo',
+          text2: 'Vui lòng chọn đầy đủ thông tin đặt lịch',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
         return;
       }
       const tokenString = await AsyncStorage.getItem('userToken');
       const token = tokenString ? JSON.parse(tokenString) : null;
       if (!token || !token.raw) {
         console.log("Token không tồn tại");
-        Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
+        //Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: 'Bạn chưa đăng nhập, vui lòng đăng nhập lại.',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
         return;
       }
       const response = await axios.post(
@@ -133,7 +147,24 @@ const BookDoctorAppointment = ({ route }) => {
         }
       );
 
-      if (response.data.code === 1000) {
+      if (response.data.code === 3333) {
+        console.log('Token hết hạn. Đang làm mới...');
+        const newToken = await refreshToken();
+        if (newToken) {
+          token = { raw: newToken };
+          await axios.put(
+            'https://api.unime.site/UNIME/password',
+            data,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${newToken}`,
+              },
+            }
+          );
+        }
+      }
+      else if (response.data.code === 1000) {
         navigation.navigate('appointment success', {
           doctorDetails,
           date: selectedDate,
@@ -141,11 +172,25 @@ const BookDoctorAppointment = ({ route }) => {
           selectedService,
         });
       } else {
-        Alert.alert('Thông báo', 'Đặt lịch không thành công');
+        //Alert.alert('Thông báo', 'Đặt lịch không thành công');
+        Toast.show({
+          type: 'warning',
+          text1: 'Thông báo',
+          text2: 'Đặt lịch không thành công',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       }
     } catch (error) {
       console.error('Error booking appointment:', error);
-      Alert.alert('Thông báo', 'Có lỗi xảy ra khi đặt lịch');
+      //Alert.alert('Thông báo', 'Có lỗi xảy ra khi đặt lịch');
+      Toast.show({
+        type: 'error',
+        text1: 'Thông báo',
+        text2: 'Có lỗi xảy ra khi đặt lịch',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     } finally {
       setIsLoading(false);
     }

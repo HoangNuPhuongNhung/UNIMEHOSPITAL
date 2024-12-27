@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
+import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import { refreshToken, checkValidToken } from '../services/tokenHelper';
+import { AuthContext } from '../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+
 export default function ChangePasswordScreen() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -11,16 +15,36 @@ export default function ChangePasswordScreen() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const { logout } = useContext(AuthContext);
+  const navigation = useNavigation();
   const resetForm = () => {
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
   };
 
+  
+  const handleLogout = () => {
+    Alert.alert(
+      "Phiên đăng nhập hết hạn",
+      "Vui lòng đăng nhập lại!",
+      [
+        {
+          text: "Hủy",
+          style: "cancel"
+        },
+        { text: "Đồng ý", onPress: () => {
+            logout();
+            navigation.replace("Login"); 
+          }
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      // Alert.alert('Lỗi', 'Mật khẩu không được để trống!');
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -32,7 +56,6 @@ export default function ChangePasswordScreen() {
     }
 
     if (newPassword.length < 6) {
-      // Alert.alert('Lỗi', 'Mật khẩu mới phải có ít nhất 6 ký tự!');
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -42,8 +65,8 @@ export default function ChangePasswordScreen() {
       });
       return;
     }
+
     if (newPassword !== confirmPassword) {
-      // Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp!');
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -55,7 +78,6 @@ export default function ChangePasswordScreen() {
     }
 
     if (currentPassword === newPassword) {
-      // Alert.alert('Lỗi', 'Mật khẩu mới không được trùng với mật khẩu hiện tại!');
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -65,11 +87,11 @@ export default function ChangePasswordScreen() {
       });
       return;
     }
+
     const tokenString = await AsyncStorage.getItem('userToken');
-    const token = tokenString ? JSON.parse(tokenString) : null;
-    if (!token || !token.raw) { 
+    let token = tokenString ? JSON.parse(tokenString) : null;
+    if (!token || !token.raw) {
       console.log("Token không tồn tại");
-      // Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -79,61 +101,91 @@ export default function ChangePasswordScreen() {
       });
       return;
     }
-    console.log(token);
+
     const data = {
       oldPassword: currentPassword,
       newPassword: newPassword,
     };
-    console.log(data);
-    try {
-      const response = await axios.put(
-        'https://api.unime.site/UNIME/password',
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token.raw}`,
-          },
-        }
-      );
-
-      if (response.data.code !== 1000) {
-        // Alert.alert('Lỗi', 'Mật khẩu hiện tại không đúng!');
+    const checkToken = await checkValidToken(token.raw);
+    if (checkToken) {
+      console.log('Token còn hạn!');
+      try {
+        await axios.put(
+          'https://api.unime.site/UNIME/password',
+          data,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token.raw}`,
+            },
+          }
+        );
+      } catch (error) {
+        console.error('Lỗi khi đổi mật khẩu:', error);
+        console.log('ahihi');
         Toast.show({
           type: 'error',
           text1: 'Lỗi',
-          text2: 'Mật khẩu hiện tại không đúng!',
+          text2: 'Đã xảy ra lỗi, vui lòng thử lại sau.',
           visibilityTime: 2000,
           autoHide: true,
         });
-        return;
       }
-
-      // Alert.alert('Thành công', 'Mật khẩu đã được đổi thành công!');
-      Toast.show({
-        type: 'success',
-        text1: 'Thành công',
-        text2: 'Mật khẩu đã được đổi thành công!',
-        visibilityTime: 2000,
-        autoHide: true,
-      });
-      resetForm();
-    } catch (error) {
-      console.error('Error changing password:', error);
-      // Alert.alert('Lỗi', 'Đã xảy ra lỗi, vui lòng thử lại sau.');
-      Toast.show({
-        type: 'error',
-        text1: 'Lỗi',
-        text2: 'Đã xảy ra lỗi, vui lòng thử lại sau.',
-        visibilityTime: 2000,
-        autoHide: true,
-      });
+    } else {
+      console.log('Token hết hạn ! Đợi làm mới');
+      const newToken = await refreshToken();
+      if (newToken) {
+        token = { raw: newToken };
+        try {
+          await axios.put(
+            'https://api.unime.site/UNIME/password',
+            data,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token.raw}`,
+              },
+            }
+          );
+        } catch (error) {
+          console.error('Lỗi khi đổi mật khẩu:', error);
+          console.log('ahihi');
+          Toast.show({
+            type: 'error',
+            text1: 'Lỗi',
+            text2: 'Đã xảy ra lỗi, vui lòng thử lại sau.',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+        }
+      } else {
+        handleLogout();
+        return;
     }
-  };
-
+    }
+    console.log('Doi duoc mật khẩu rồi');
+    Toast.show({
+      type: 'success',
+      text1: 'Thành công',
+      text2: 'Mật khẩu đã được đổi thành công!',
+      visibilityTime: 2000,
+      autoHide: true,
+    });
+    resetForm();
+    // } catch (error) {
+    // console.error('Lỗi khi đổi mật khẩu:', error);
+    // console.log('ahihi');
+    // Toast.show({
+    //   type: 'error',
+    //   text1: 'Lỗi',
+    //   text2: 'Đã xảy ra lỗi, vui lòng thử lại sau.',
+    //   visibilityTime: 2000,
+    //   autoHide: true,
+    // });
+    // };
+  }
   return (
     <View style={styles.container}>
-      
       <Text style={styles.title}>Đổi mật khẩu</Text>
 
       <View style={styles.inputContainer}>
