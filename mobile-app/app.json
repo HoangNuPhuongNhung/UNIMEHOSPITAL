@@ -2,7 +2,7 @@
   "expo": {
     "newArchEnabled": true,
     "name": "Unime Hospital",
-    "slug": "Unime Hospital",
+    "slug": "mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/adaptive-icon.png",
