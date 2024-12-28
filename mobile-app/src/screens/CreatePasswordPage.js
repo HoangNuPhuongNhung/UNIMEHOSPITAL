@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, A
 import axios from 'axios';
 import RadioGroup from 'react-native-radio-buttons-group';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Toast from 'react-native-toast-message';
 const CreatePasswordPage = ({ route, navigation }) => {
   const email = route.params?.email || '';
   console.log(email);
@@ -112,7 +113,7 @@ const CreatePasswordPage = ({ route, navigation }) => {
       patientEmail: email,
       patientName: name,
       patientAddress: address,
-      patientPhoneNumber: phoneNumber,
+      patientPhoneNumber: "+84" + phoneNumber.substring(1),
       patientGender: gender,
       patientDateOfBirth: dateOfBirth,
     };
@@ -143,10 +144,16 @@ const CreatePasswordPage = ({ route, navigation }) => {
         onHide: () => navigation.navigate('Login')
       });
     } else {
-      Alert.alert('Lỗi', `Đăng ký thất bại: ${response.data.message || 'Vui lòng thử lại'}`);
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: `Đăng ký thất bại: ${response.data.message || 'Vui lòng thử lại'}`,
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   } catch (error) {
-    console.error('Error details:', {
+    console.log('Error details:', {
       status: error.response?.status,
       data: error.response?.data,
       message: error.message
@@ -156,7 +163,13 @@ const CreatePasswordPage = ({ route, navigation }) => {
       || error.response?.data?.error 
       || 'Không thể kết nối đến máy chủ.';
     
-    Alert.alert('Lỗi', errorMessage);
+    Toast.show({
+      type: 'error',
+      text1: 'Lỗi',
+      text2: errorMessage,
+      visibilityTime: 2000,
+      autoHide: true,
+    });
   }
 };
 
