@@ -3,7 +3,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomePage from '../screens/HomePage';
 import SearchPage from '../screens/SearchPage';
-import AppointmentPage from '../screens/AppointmentPage';
+import AppointmentPage from '../screens/NextAppointmentPage';
 import ProfilePage from '../screens/ProfilePage';
 import ServicePage from '../screens/ServicePage';
 import { AntDesign } from '@expo/vector-icons';

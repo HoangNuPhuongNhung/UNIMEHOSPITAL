@@ -54,12 +54,12 @@ const ProfilePage = ({ route }) => {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('UserInfo')}>
           <Text style={styles.buttonText}>Thông tin cá nhân</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AppointmentPage')}>
-          <Text style={styles.buttonText}>Hồ sơ đặt lịch</Text>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NextAppointmentPage')}>
+          <Text style={styles.buttonText}>Lịch hẹn sắp tới</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Cài đặt tài khoản</Text>
-        </TouchableOpacity> */}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('HistoryBookingPage')}>
+          <Text style={styles.buttonText}>Lịch sử</Text>
+        </TouchableOpacity>
         <TouchableOpacity 
           style={styles.button}
           onPress={() => navigation.navigate('change password')}

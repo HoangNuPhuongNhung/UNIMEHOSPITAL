@@ -121,7 +121,7 @@ export default function ChangePasswordScreen() {
           }
         );
       } catch (error) {
-        console.error('Lỗi khi đổi mật khẩu:', error);
+        console.long('Lỗi khi đổi mật khẩu:', error);
         console.log('ahihi');
         Toast.show({
           type: 'error',

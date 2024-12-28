@@ -7,7 +7,7 @@ export const refreshToken = async () => {
         const token = tokenString ? JSON.parse(tokenString) : null;
 
         if (!token || !token.raw) {
-            console.error('Không tìm thấy token, người dùng cần đăng nhập lại.');
+            console.log('Không tìm thấy token, người dùng cần đăng nhập lại.');
             return null;
         }
 

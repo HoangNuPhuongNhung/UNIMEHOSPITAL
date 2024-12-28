@@ -60,27 +60,42 @@ const BookDoctorAppointment = ({ route }) => {
 
   useEffect(() => {
     if (selectedDate && doctorTimeWork.length > 0) {
+      // Tính toán weekOfYear và dayOfWeek của selectedDate
+      const getWeekOfYear = (date) => {
+        const tempDate = new Date(date);
+        tempDate.setHours(0, 0, 0, 0);
+        tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7)); // Chuyển sang Thứ Năm
+        const week1 = new Date(tempDate.getFullYear(), 0, 4); // Tuần 1 bắt đầu từ 4/1
+        return 1 + Math.round(((tempDate - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+      };
+  
       const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
       const selectedDay = days[new Date(selectedDate).getDay()];
-
+      const selectedWeek = getWeekOfYear(selectedDate);
+      const selectedYear = new Date(selectedDate).getFullYear();
+  
+      // Lọc danh sách dựa vào năm, tuần, ngày và trạng thái
       const availableSlots = doctorTimeWork
         .filter(slot =>
-          slot.dayOfWeek === selectedDay &&
-          slot.doctorTimeworkStatus === "Available"
+          slot.doctorTimeworkYear === selectedYear && 
+          slot.weekOfYear === selectedWeek && 
+          slot.dayOfWeek === selectedDay && 
+          slot.doctorTimeworkStatus === "Available" 
         )
         .map(slot => ({
           id: slot.doctorTimeworkId,
-          time: `${slot.startTime.slice(0, 5)} - ${slot.endTime.slice(0, 5)}`
+          time: `${slot.startTime.slice(0, 5)} - ${slot.endTime.slice(0, 5)}` // Định dạng thời gian
         }));
-
-      setTimeSlots(availableSlots);
-      setSelectedTime(null);
+  
+      setTimeSlots(availableSlots); // Cập nhật các khung giờ hợp lệ
+      setSelectedTime(null); // Reset lựa chọn thời gian
     }
   }, [selectedDate, doctorTimeWork]);
-
+  
   useEffect(() => {
     if (doctor?.doctorId) {
-      axios.get(`https://api.unime.site/UNIME/doctortimework/get/listByDoctor/${doctor.doctorId}`)
+      axios
+        .get(`https://api.unime.site/UNIME/doctortimework/get/listByDoctor/${doctor.doctorId}`)
         .then(response => {
           if (response.data.code === 1000) {
             setDoctorTimeWork(response.data.result);
@@ -117,7 +132,7 @@ const BookDoctorAppointment = ({ route }) => {
       }
     } catch (error) {
       setError('Error fetching doctor details');
-      console.error('Error:', error);
+      console.long('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -191,7 +206,7 @@ const BookDoctorAppointment = ({ route }) => {
             });
           }
         } catch (error) {
-          console.error('Error booking appointment:', error);
+          console.log('Error booking appointment:', error);
           Toast.show({
             type: 'error',
             text1: 'Thông báo',

@@ -16,13 +16,14 @@ import ChangePasswordPage from './src/screens/ChangePasswordPage';
 import DoctorDetailPage from './src/screens/DoctorDetailPage';
 import BookDoctorAppointment from './src/screens/BookDoctorAppointment';
 import AppointmentSuccessPage from './src/screens/AppointmentSuccessPage';
-import AppointmentPage from './src/screens/AppointmentPage';
+import NextAppointmentPage from './src/screens/NextAppointmentPage';
 import BottomTab from './src/navigations/BottomTab';
 import { createStackNavigator } from '@react-navigation/stack';
 import UserInfoPage from './src/screens/UserInfoPage';
 import ForgotPwPage from './src/screens/ForgotPasswordPage';
 import DoctorByServicePage from './src/screens/DoctorByServicePage';
 import WebViewScreen from './src/screens/WebViewScreen';
+import HistoryBookingPage from './src/screens/HistoryBookingPage';
 const StackNavigator = createStackNavigator();
 
 const toastConfig = {
@@ -124,7 +125,8 @@ export default function App() {
             <StackNavigator.Screen name="UserInfo" component={UserInfoPage} options={{ title: 'Thông tin cá nhân' }} />
             <StackNavigator.Screen name="ForgotPw" component={ForgotPwPage} options={{ headerShown: false }} />
             <StackNavigator.Screen name="DoctorByServicePage" component={DoctorByServicePage} options={{ title: 'Danh sách bác sĩ' }} />
-            <StackNavigator.Screen name="AppointmentPage" component={AppointmentPage} options={{ title: 'Lịch khám' }} />
+            <StackNavigator.Screen name="NextAppointmentPage" component={NextAppointmentPage} options={{ title: 'Lịch hẹn sắp tới' }} />
+            <StackNavigator.Screen name="HistoryBookingPage" component={HistoryBookingPage} options={{ title: 'Lịch sử' }} />
             <StackNavigator.Screen 
               name="WebView" 
               component={WebViewScreen} 
