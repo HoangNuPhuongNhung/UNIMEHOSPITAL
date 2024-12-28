@@ -58,8 +58,8 @@ export const login = async (username, password) => {
       throw new Error('Invalid response format');
     }
   } catch (error) {
-    // console.error("Lỗi đăng nhập:", error.message);
-    throw new Error(error.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.');
+     console.log("Lỗi đăng nhập:", error.message);
+    throw new Error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.');
   }
 };
 
