@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
@@ -6,6 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import { refreshToken, checkValidToken } from '../services/tokenHelper';
+import { AuthContext } from '../contexts/AuthContext';
 const BookDoctorAppointment = ({ route }) => {
   const { doctor, service = null } = route.params;
   // console.log(service);
@@ -22,7 +24,7 @@ const BookDoctorAppointment = ({ route }) => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [doctorTimeWork, setDoctorTimeWork] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { logout } = useContext(AuthContext);
   useEffect(() => {
     fetchDoctorDetails();
   }, []);
@@ -88,6 +90,25 @@ const BookDoctorAppointment = ({ route }) => {
     }
   }, [doctor?.doctorId]);
 
+  const handleLogout = () => {
+    Alert.alert(
+      "Phiên đăng nhập hết hạn",
+      "Vui lòng đăng nhập lại!",
+      [
+        {
+          text: "Hủy",
+          style: "cancel"
+        },
+        { text: "Đồng ý", onPress: () => {
+            logout();
+            navigation.replace("Login"); 
+          }
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+
   const fetchDoctorDetails = async () => {
     try {
       const response = await axios.get(`https://api.unime.site/UNIME/doctors/get/getDetail/${doctor.doctorId}`);
@@ -105,11 +126,10 @@ const BookDoctorAppointment = ({ route }) => {
   const confirmAppointment = async () => {
     try {
       setIsLoading(true);
-
+  
       const selectedTimeSlot = timeSlots.find(slot => slot.time === selectedTime);
-
+  
       if (!selectedTimeSlot || !selectedService) {
-        //Alert.alert('Thông báo', 'Vui lòng chọn đầy đủ thông tin đặt lịch');
         Toast.show({
           type: 'warning',
           text1: 'Thông báo',
@@ -119,11 +139,12 @@ const BookDoctorAppointment = ({ route }) => {
         });
         return;
       }
+  
       const tokenString = await AsyncStorage.getItem('userToken');
-      const token = tokenString ? JSON.parse(tokenString) : null;
+      let token = tokenString ? JSON.parse(tokenString) : null;
+  
       if (!token || !token.raw) {
         console.log("Token không tồn tại");
-        //Alert.alert("Lỗi", "Bạn chưa đăng nhập, vui lòng đăng nhập lại.");
         Toast.show({
           type: 'error',
           text1: 'Lỗi',
@@ -133,57 +154,105 @@ const BookDoctorAppointment = ({ route }) => {
         });
         return;
       }
-      const response = await axios.post(
-        'https://api.unime.site/UNIME/appointments',
-        {
-          doctortimeworkId: selectedTimeSlot.id,
-          doctorserviceId: selectedService.serviceId
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${token.raw}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (response.data.code === 3333) {
-        console.log('Token hết hạn. Đang làm mới...');
-        const newToken = await refreshToken();
-        if (newToken) {
-          token = { raw: newToken };
-          await axios.put(
-            'https://api.unime.site/UNIME/password',
-            data,
+  
+      const checkToken = await checkValidToken(token.raw);
+  
+      if (checkToken) {
+        console.log('Token còn hạn!');
+        try {
+          const response = await axios.post(
+            'https://api.unime.site/UNIME/appointments',
+            {
+              doctortimeworkId: selectedTimeSlot.id,
+              doctorserviceId: selectedService.serviceId,
+            },
             {
               headers: {
+                'Authorization': `Bearer ${token.raw}`,
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${newToken}`,
               },
             }
           );
+  
+          if (response.data.code === 1000) {
+            navigation.navigate('appointment success', {
+              doctorDetails,
+              date: selectedDate,
+              time: selectedTime,
+              selectedService,
+            });
+          } else {
+            Toast.show({
+              type: 'warning',
+              text1: 'Thông báo',
+              text2: 'Đặt lịch không thành công',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          }
+        } catch (error) {
+          console.error('Error booking appointment:', error);
+          Toast.show({
+            type: 'error',
+            text1: 'Thông báo',
+            text2: 'Có lỗi xảy ra khi đặt lịch',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
         }
-      }
-      else if (response.data.code === 1000) {
-        navigation.navigate('appointment success', {
-          doctorDetails,
-          date: selectedDate,
-          time: selectedTime,
-          selectedService,
-        });
       } else {
-        //Alert.alert('Thông báo', 'Đặt lịch không thành công');
-        Toast.show({
-          type: 'warning',
-          text1: 'Thông báo',
-          text2: 'Đặt lịch không thành công',
-          visibilityTime: 2000,
-          autoHide: true,
-        });
+        console.log('Token hết hạn! Đang làm mới...');
+        const newToken = await refreshToken();
+        if (newToken) {
+          token = { raw: newToken };
+          try {
+            const response = await axios.post(
+              'https://api.unime.site/UNIME/appointments',
+              {
+                doctortimeworkId: selectedTimeSlot.id,
+                doctorserviceId: selectedService.serviceId,
+              },
+              {
+                headers: {
+                  'Authorization': `Bearer ${token.raw}`,
+                  'Content-Type': 'application/json',
+                },
+              }
+            );
+  
+            if (response.data.code === 1000) {
+              navigation.navigate('appointment success', {
+                doctorDetails,
+                date: selectedDate,
+                time: selectedTime,
+                selectedService,
+              });
+            } else {
+              Toast.show({
+                type: 'warning',
+                text1: 'Thông báo',
+                text2: 'Đặt lịch không thành công',
+                visibilityTime: 2000,
+                autoHide: true,
+              });
+            }
+          } catch (error) {
+            console.error('Error booking appointment:', error);
+            Toast.show({
+              type: 'error',
+              text1: 'Thông báo',
+              text2: 'Có lỗi xảy ra khi đặt lịch',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          }
+        } else {
+          handleLogout();
+          return;
+        }
       }
     } catch (error) {
       console.error('Error booking appointment:', error);
-      //Alert.alert('Thông báo', 'Có lỗi xảy ra khi đặt lịch');
       Toast.show({
         type: 'error',
         text1: 'Thông báo',
@@ -194,7 +263,7 @@ const BookDoctorAppointment = ({ route }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
   if (loading) {
     return <View style={styles.container}><Text>Loading...</Text></View>;
