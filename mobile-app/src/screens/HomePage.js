@@ -230,18 +230,16 @@ const HomePage = () => {
   };
 
   const renderItem = ({ item }) => {
-    const title = item.doctorName; // Sử dụng trực tiếp doctorName làm title
-    const place = item.serviceName; // Sử dụng trực tiếp serviceName làm place
-    // const date = getCurrentWeekDate(item.dayOfWeek); // Map dayOfWeek sang ngày
+    // const date = getCurrentWeekDate(item.dayOfWeek); 
     const date = getAppointmentDateFromAPI(item.year, item.weekOfYear, item.dayOfWeek);
-    const time = `${item.startTime} - ${item.endTime}`; // Ghép startTime và endTime
+    const time = `${item.startTime} - ${item.endTime}`; 
 
     return (
       <View style={styles.appointmentCard}>
         <Icon name="account" size={30} color="#fff" />
         <View style={{ marginLeft: 10 }}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.place}>{place}</Text>
+          <Text style={styles.title}>{item.doctorName}</Text>
+          <Text style={styles.place}>{item.serviceName} </Text>
           <View style={styles.dateContainer}>
             <Text style={styles.date}>{date}</Text>
             <Text style={styles.time}>{time}</Text>

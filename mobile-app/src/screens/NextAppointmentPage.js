@@ -236,10 +236,17 @@ const AppointmentCard = ({ appointment,fetchAppointments  }) => {
     <View style={styles.card}>
       <View style={styles.infoRow}>
         {/* Hiển thị ngày thực tế */}
-        <Text style={styles.value}>{formattedDate}</Text>
-        <Text style={styles.value}>
-          {appointment.startTime} - {appointment.endTime}
-        </Text>
+        <View>
+          <Text style={styles.value}>Ngày: {formattedDate}</Text>
+        </View>
+        <View>
+          <Text style={styles.value}>
+            Thời gian: {appointment.startTime} - {appointment.endTime}
+          </Text>
+        </View>
+      </View>
+      <View style={styles.infoRow}>
+        <Text>Dịch vụ: </Text>
         <Text style={styles.value}>{appointment.serviceName}</Text>
       </View>
       <View style={styles.infoRow}>
@@ -471,6 +478,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    marginBottom: 20,
   },
   datePickerContainer: {
     flexDirection: 'row',
