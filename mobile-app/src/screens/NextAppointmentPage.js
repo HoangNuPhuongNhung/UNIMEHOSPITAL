@@ -54,12 +54,12 @@ const getAppointmentDateFromAPI = (year, weekOfYear, dayOfWeek) => {
     saturday: 6,
     sunday: 0,
   };
-
   const appointmentDate = setDay(targetWeekStart, weekDayMap[dayOfWeek]);
 
   // Định dạng ngày để hiển thị
   return format(appointmentDate, 'dd/MM/yyyy');
-};
+}
+
 const confirmCancel = (appointmentId, fetchAppointments, logout, navigation) => {
   Alert.alert(
     "Xác nhận hủy",
@@ -326,7 +326,6 @@ const AppointmentList = () => {
               const appointmentDate = getAppointmentDateFromAPI(appointment.year, appointment.weekOfYear, appointment.dayOfWeek);
               return appointmentDate === currentDate;
             });
-
             setAppointments(allAppointments);
             setFilteredAppointments(todayAppointments);
           }
@@ -391,6 +390,7 @@ const AppointmentList = () => {
     } finally {
       setLoading(false);
     }
+    setSelectedDate(new Date());
   };
 
   useEffect(() => {
