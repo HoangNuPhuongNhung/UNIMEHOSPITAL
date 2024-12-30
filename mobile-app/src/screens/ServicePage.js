@@ -27,7 +27,7 @@ const ServicePage = () => {
                 setServices(response.data.result);
             }   
         } catch (error) {
-            console.error('Error fetching services:', error);
+            console.log('Error fetching services:', error);
         }
     };
 

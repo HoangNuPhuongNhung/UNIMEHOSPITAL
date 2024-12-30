@@ -49,12 +49,12 @@ const BookDoctorAppointment = ({ route }) => {
               setSelectedService(services[0]);
             }
           } else {
-            console.error('Unexpected data format:', response.data);
+            console.log('Unexpected data format:', response.data);
             setServiceList([]);
             setFilteredServices([]);
           }
         })
-        .catch(error => console.error('Error fetching services:', error));
+        .catch(error => console.log('Error fetching services:', error));
     }
   }, [doctor?.doctorId]);
 
@@ -101,7 +101,7 @@ const BookDoctorAppointment = ({ route }) => {
             setDoctorTimeWork(response.data.result);
           }
         })
-        .catch(error => console.error('Error fetching timeWork:', error));
+        .catch(error => console.log('Error fetching timeWork:', error));
     }
   }, [doctor?.doctorId]);
 
@@ -252,7 +252,7 @@ const BookDoctorAppointment = ({ route }) => {
               });
             }
           } catch (error) {
-            console.error('Error booking appointment:', error);
+            console.log('Error booking appointment:', error);
             Toast.show({
               type: 'error',
               text1: 'Thông báo',
@@ -267,7 +267,7 @@ const BookDoctorAppointment = ({ route }) => {
         }
       }
     } catch (error) {
-      console.error('Error booking appointment:', error);
+      console.log('Error booking appointment:', error);
       Toast.show({
         type: 'error',
         text1: 'Thông báo',

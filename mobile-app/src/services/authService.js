@@ -68,7 +68,7 @@ export const logout = async () => {
     await AsyncStorage.removeItem('userToken');
     await AsyncStorage.removeItem('userInfo'); // Xóa thông tin người dùng
   } catch (error) {
-    console.error('Lỗi đăng xuất:', error.message);
+    console.log('Lỗi đăng xuất:', error.message);
   }
 };
 
@@ -98,7 +98,7 @@ export const getUserInfo = async () => {
       throw new Error('Không thể lấy thông tin user.');
     }
   } catch (error) {
-    console.error('Lỗi lấy thông tin user:', error.message);
+    console.log('Lỗi lấy thông tin user:', error.message);
     throw error;
   }
 };

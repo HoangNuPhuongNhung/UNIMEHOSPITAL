@@ -15,7 +15,7 @@ import axios from 'axios';
 
 const DoctorByServicePage = ({ route, navigation }) => {
     const { service } = route.params;
-    console.log(service);
+    // console.log(service);
     const [doctors, setDoctors] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(5);
     const [search, setSearch] = useState('');
@@ -28,7 +28,7 @@ const DoctorByServicePage = ({ route, navigation }) => {
                     setDoctors(response.data.result);
                 }
             } catch (error) {
-                console.error('Error fetching doctors:', error);
+                console.log('Error fetching doctors:', error);
             }
         };
 

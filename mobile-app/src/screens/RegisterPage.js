@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { sendOtp } from '../services/otpService';
+import Toast from 'react-native-toast-message';
 const RegisterPage = ({ navigation }) => {
   const [email, setEmail] = useState('');
 
@@ -13,16 +14,44 @@ const RegisterPage = ({ navigation }) => {
           if (data.code === 1000) {
             navigation.navigate('OTP', { email, otp: data.result }); // Chuyển sang OTPPage
           } else {
-            alert('Gửi OTP thất bại. Vui lòng thử lại!');
+            // alert('Gửi OTP thất bại. Vui lòng thử lại!');
+            Toast.show({
+                type: 'warning',
+                text1: 'Lỗi',
+                text2: 'Gửi OTP thất bại. Vui lòng thử lại!',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
           }
         } catch (error) {
-          alert('Có lỗi xảy ra khi gửi OTP. Vui lòng kiểm tra lại!');
+          // alert('Có lỗi xảy ra khi gửi OTP. Vui lòng kiểm tra lại!');
+          Toast.show({
+            type: 'error',
+            text1: 'Lỗi',
+            text2: 'Có lỗi xảy ra khi gửi OTP. Vui lòng kiểm tra lại!',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
         }
       } else {
-        alert('Vui lòng nhập đúng định dạng email!');
+        // alert('Vui lòng nhập đúng định dạng email!');
+        Toast.show({
+            type: 'warning',
+            text1: 'Lỗi',
+            text2: 'Vui lòng nhập đúng định dạng email!',
+            visibilityTime: 2000,
+            autoHide: true,
+        });
       }
     } else {
-      alert('Vui lòng nhập email!');
+      // alert('Vui lòng nhập email!');
+      Toast.show({
+        type: 'warning',
+        text1: 'Lỗi',
+        text2: 'Vui lòng nhập email!',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 

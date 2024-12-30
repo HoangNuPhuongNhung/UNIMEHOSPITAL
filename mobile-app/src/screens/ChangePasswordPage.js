@@ -148,8 +148,7 @@ export default function ChangePasswordScreen() {
             }
           );
         } catch (error) {
-          console.error('Lỗi khi đổi mật khẩu:', error);
-          console.log('ahihi');
+          console.log('Lỗi khi đổi mật khẩu:', error);
           Toast.show({
             type: 'error',
             text1: 'Lỗi',

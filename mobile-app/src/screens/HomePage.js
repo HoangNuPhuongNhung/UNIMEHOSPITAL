@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../contexts/AuthContext';
 import { refreshToken, checkValidToken } from '../services/tokenHelper';
+import { startOfISOWeek, addWeeks, setDay, format } from 'date-fns';
 // const appointments = [
 //     { id: 1, title: 'Tâm lý', place: 'Phòng khám Saigon', date: '25 Sep', time: '10:30am', icon: 'account' },
 //     { id: 2, title: 'Tiêu hóa', place: 'Bệnh viện chợ rẫy', date: '26 Sep', time: '10:30am', icon: 'account' },
@@ -40,7 +41,41 @@ const HomePage = () => {
     }, [])
   );
 
-  const getCurrentWeekDate = (dayOfWeek) => {
+  // const getCurrentWeekDate = (dayOfWeek) => {
+  //   const weekDayMap = {
+  //     monday: 1,
+  //     tuesday: 2,
+  //     wednesday: 3,
+  //     thursday: 4,
+  //     friday: 5,
+  //     saturday: 6,
+  //     sunday: 0,
+  //   };
+
+  //   const today = new Date();
+  //   const currentDay = today.getDay();
+  //   const targetDay = weekDayMap[dayOfWeek.toLowerCase()];
+
+  //   const diff = targetDay - currentDay;
+  //   const targetDate = new Date(today);
+  //   targetDate.setDate(today.getDate() + diff);
+
+  //   return targetDate.toLocaleDateString('vi-VN', {
+  //     day: '2-digit',
+  //     month: '2-digit',
+  //     year: 'numeric',
+  //   });
+  // };
+
+  const getAppointmentDateFromAPI = (year, weekOfYear, dayOfWeek) => {
+    // Xác định ngày đầu tiên của tuần đầu tiên (ISO week)
+    const firstDayOfYear = new Date(year, 0, 1);
+    const firstISOWeekStart = startOfISOWeek(firstDayOfYear);
+  
+    // Thêm số tuần để tìm đúng tuần
+    const targetWeekStart = addWeeks(firstISOWeekStart, weekOfYear - 1);
+  
+    // Thêm ngày trong tuần
     const weekDayMap = {
       monday: 1,
       tuesday: 2,
@@ -50,22 +85,12 @@ const HomePage = () => {
       saturday: 6,
       sunday: 0,
     };
-
-    const today = new Date();
-    const currentDay = today.getDay();
-    const targetDay = weekDayMap[dayOfWeek.toLowerCase()];
-
-    const diff = targetDay - currentDay;
-    const targetDate = new Date(today);
-    targetDate.setDate(today.getDate() + diff);
-
-    return targetDate.toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+  
+    const appointmentDate = setDay(targetWeekStart, weekDayMap[dayOfWeek]);
+  
+    // Định dạng ngày để hiển thị
+    return format(appointmentDate, 'dd/MM/yyyy');
   };
-
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) return 'Chào buổi sáng!';
@@ -78,7 +103,7 @@ const HomePage = () => {
     const tokenString = await AsyncStorage.getItem('userToken');
     let token = tokenString ? JSON.parse(tokenString) : null;
     if (!token || !token.raw) {
-      console.error('Token không tồn tại');
+      console.log('Token không tồn tại');
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -167,7 +192,7 @@ const HomePage = () => {
 
       setRssArticles(articles);
     } catch (error) {
-      console.error('Error fetching RSS feed with axios:', error);
+      console.log('Error fetching RSS feed with axios:', error);
     }
   };
 
@@ -207,7 +232,8 @@ const HomePage = () => {
   const renderItem = ({ item }) => {
     const title = item.doctorName; // Sử dụng trực tiếp doctorName làm title
     const place = item.serviceName; // Sử dụng trực tiếp serviceName làm place
-    const date = getCurrentWeekDate(item.dayOfWeek); // Map dayOfWeek sang ngày
+    // const date = getCurrentWeekDate(item.dayOfWeek); // Map dayOfWeek sang ngày
+    const date = getAppointmentDateFromAPI(item.year, item.weekOfYear, item.dayOfWeek);
     const time = `${item.startTime} - ${item.endTime}`; // Ghép startTime và endTime
 
     return (

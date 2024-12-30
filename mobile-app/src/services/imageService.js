@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
-
+import Toast from 'react-native-toast-message';
 const getFileForUpload = async (uri) => {
   const newUri = FileSystem.cacheDirectory + 'temp_upload.jpg'; 
   await FileSystem.copyAsync({
@@ -39,7 +39,7 @@ const uploadToCloudinary = async (file) => {
     console.log('Uploaded successfully:', response.data);
     return response.data.secure_url; // URL của ảnh sau khi upload
   } catch (error) {
-    console.error('Upload failed:', error);
+    console.log('Upload failed:', error);
     return null;
   }
 };
@@ -74,7 +74,7 @@ export const selectAndUploadImage = async () => {
       return null;
     }
   } catch (error) {
-    console.error('Error selecting/uploading image:', error);
+    console.log('Error selecting/uploading image:', error);
     return null;
   }
 };

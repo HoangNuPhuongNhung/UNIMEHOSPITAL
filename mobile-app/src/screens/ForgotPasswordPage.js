@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { sendOtp } from '../services/otpService';
 import LoginPage from './LoginPage';
 import axios from 'axios';
+import Toast from 'react-native-toast-message';
 const ForgotPwPage = ({ navigation }) => {
     const [email, setEmail] = useState('');
 
@@ -22,18 +23,39 @@ const ForgotPwPage = ({ navigation }) => {
                       params: { mail: email },
                     });
                     if(response.data.code === 1000){
-                        Alert.alert('Thành công !', 'Mật khẩu mới đã được gửi vào email của bạn');
+                        // Alert.alert('Thành công !', 'Mật khẩu mới đã được gửi vào email của bạn');
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Thành công',
+                            text2: 'Mật khẩu mới đã được gửi vào email của bạn',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
                         navigation.navigate('Login');
                     }
                   } catch (error) {
-                    console.error('Error sending OTP:', error.response ? error.response.data : error.message);
+                    console.log('Error sending OTP:', error.response ? error.response.data : error.message);
                     throw error; 
                   }
             } else {
-                Alert.alert('Lỗi','Vui lòng nhập đúng định dạng email!');
+                // Alert.alert('Lỗi','Vui lòng nhập đúng định dạng email!');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Lỗi',
+                    text2: 'Vui lòng nhập đúng định dạng email!',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             }
         } else {
-            Alert.alert('Lỗi','Vui lòng nhập email!');
+            // Alert.alert('Lỗi','Vui lòng nhập email!');
+            Toast.show({
+                type: 'error',
+                text1: 'Lỗi',
+                text2: 'Vui lòng nhập email!',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
     return (

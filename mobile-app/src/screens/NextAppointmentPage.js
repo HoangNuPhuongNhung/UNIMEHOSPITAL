@@ -9,8 +9,42 @@ import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../contexts/AuthContext';
 import { refreshToken, checkValidToken } from '../services/tokenHelper';
+import { startOfISOWeek, addWeeks, setDay, format } from 'date-fns';
 
-const getCurrentWeekDate = (dayOfWeek) => {
+// const getCurrentWeekDate = (dayOfWeek) => {
+//   const weekDayMap = {
+//     monday: 1,
+//     tuesday: 2,
+//     wednesday: 3,
+//     thursday: 4,
+//     friday: 5,
+//     saturday: 6,
+//     sunday: 0,
+//   };
+
+//   const today = new Date();
+//   const currentDay = today.getDay();
+//   const targetDay = weekDayMap[dayOfWeek.toLowerCase()];
+
+//   const diff = targetDay - currentDay;
+//   const targetDate = new Date(today); 
+//   targetDate.setDate(today.getDate() + diff);
+
+//   return targetDate.toLocaleDateString('vi-VN', {
+//     day: '2-digit',
+//     month: '2-digit',
+//     year: 'numeric',
+//   });
+// };
+const getAppointmentDateFromAPI = (year, weekOfYear, dayOfWeek) => {
+  // Xác định ngày đầu tiên của tuần đầu tiên (ISO week)
+  const firstDayOfYear = new Date(year, 0, 1);
+  const firstISOWeekStart = startOfISOWeek(firstDayOfYear);
+
+  // Thêm số tuần để tìm đúng tuần
+  const targetWeekStart = addWeeks(firstISOWeekStart, weekOfYear - 1);
+
+  // Thêm ngày trong tuần
   const weekDayMap = {
     monday: 1,
     tuesday: 2,
@@ -21,19 +55,10 @@ const getCurrentWeekDate = (dayOfWeek) => {
     sunday: 0,
   };
 
-  const today = new Date();
-  const currentDay = today.getDay();
-  const targetDay = weekDayMap[dayOfWeek.toLowerCase()];
+  const appointmentDate = setDay(targetWeekStart, weekDayMap[dayOfWeek]);
 
-  const diff = targetDay - currentDay;
-  const targetDate = new Date(today); 
-  targetDate.setDate(today.getDate() + diff);
-
-  return targetDate.toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
+  // Định dạng ngày để hiển thị
+  return format(appointmentDate, 'dd/MM/yyyy');
 };
 const confirmCancel = (appointmentId, fetchAppointments, logout, navigation) => {
   Alert.alert(
@@ -76,7 +101,7 @@ const handleCancel = async (appointmentId,fetchAppointments, logout, navigation)
     let token = tokenString ? JSON.parse(tokenString) : null;
 
     if (!token || !token.raw) {
-      console.error('Token không tồn tại');
+      console.log('Token không tồn tại');
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -199,7 +224,8 @@ const handleCancel = async (appointmentId,fetchAppointments, logout, navigation)
   }
 };
 const AppointmentCard = ({ appointment,fetchAppointments  }) => {
-  const formattedDate = getCurrentWeekDate(appointment.dayOfWeek);
+  // const formattedDate = getCurrentWeekDate(appointment.dayOfWeek);
+  const formattedDate = getAppointmentDateFromAPI(appointment.year, appointment.weekOfYear, appointment.dayOfWeek);
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
   const statusStyle = {
@@ -296,7 +322,8 @@ const AppointmentList = () => {
             });
 
             const todayAppointments = allAppointments.filter((appointment) => {
-              const appointmentDate = getCurrentWeekDate(appointment.dayOfWeek);
+              // const appointmentDate = getCurrentWeekDate(appointment.dayOfWeek);
+              const appointmentDate = getAppointmentDateFromAPI(appointment.year, appointment.weekOfYear, appointment.dayOfWeek);
               return appointmentDate === currentDate;
             });
 
@@ -336,7 +363,8 @@ const AppointmentList = () => {
               });
 
               const todayAppointments = allAppointments.filter((appointment) => {
-                const appointmentDate = getCurrentWeekDate(appointment.dayOfWeek);
+                // const appointmentDate = getCurrentWeekDate(appointment.dayOfWeek);
+                const appointmentDate = getAppointmentDateFromAPI(appointment.year, appointment.weekOfYear, appointment.dayOfWeek);
                 return appointmentDate === currentDate;
               });
 
@@ -383,7 +411,8 @@ const AppointmentList = () => {
       });
 
       const filtered = appointments.filter((appointment) => {
-        const appointmentDate = getCurrentWeekDate(appointment.dayOfWeek);
+        // const appointmentDate = getCurrentWeekDate(appointment.dayOfWeek);
+        const appointmentDate = getAppointmentDateFromAPI(appointment.year, appointment.weekOfYear, appointment.dayOfWeek);
         return appointmentDate === formattedSelectedDate;
       });
 

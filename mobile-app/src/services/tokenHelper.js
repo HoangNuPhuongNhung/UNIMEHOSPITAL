@@ -34,6 +34,6 @@ export const checkValidToken = async (token) => {
         });
         return response.data.result.valid;
     } catch (error) {
-        console.error('Lỗi khi kiểm tra token:', error);
+        console.log('Lỗi khi kiểm tra token:', error);
     }
 }

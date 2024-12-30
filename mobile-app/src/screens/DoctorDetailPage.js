@@ -20,7 +20,7 @@ const DoctorDetailPage = ({ route, navigation }) => {
       }
     } catch (error) {
       setError('Error fetching doctor details');
-      console.error('Error:', error);
+      console.log('Error:', error);
     } finally {
       setLoading(false);
     }

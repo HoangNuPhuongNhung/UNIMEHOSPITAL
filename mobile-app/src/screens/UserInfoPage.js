@@ -48,7 +48,7 @@ const UserInfoPage = () => {
                 });
             }
         } catch (error) {
-            console.error('Error selecting/uploading image:', error);
+            console.log('Error selecting/uploading image:', error);
             // Alert.alert('Lỗi', 'Đã xảy ra lỗi khi chọn hoặc tải ảnh!');
             Toast.show({
                 type: 'error',
@@ -162,7 +162,7 @@ const UserInfoPage = () => {
                     );
 
                 } catch (error) {
-                    console.error('Lỗi cập nhật thông tin:', error);
+                    console.log('Lỗi cập nhật thông tin:', error);
                     console.log('ahihi');
                     Toast.show({
                         type: 'error',
@@ -189,8 +189,7 @@ const UserInfoPage = () => {
                             }
                         );
                     } catch (error) {
-                        console.error('Lỗi cập nhật thông tin:', error);
-                        console.log('ahihi');
+                        console.log('Lỗi cập nhật thông tin:', error);
                         Toast.show({
                             type: 'error',
                             text1: 'Lỗi',
@@ -215,7 +214,7 @@ const UserInfoPage = () => {
                 autoHide: true,
             });
         } catch (error) {
-            console.error('API Error:', error);
+            console.log('API Error:', error);
             // Alert.alert('Lỗi', 'Không thể cập nhật thông tin!');
             Toast.show({
                 type: 'error',

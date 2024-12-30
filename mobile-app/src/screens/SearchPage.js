@@ -30,7 +30,7 @@ const DoctorListPage = () => {
         setDepartments([{ departmentId: 0, departmentName: 'Tất cả' }, ...response.data.result]);
       }
     } catch (error) {
-      console.error('Error fetching departments:', error);
+      console.log('Error fetching departments:', error);
     }
   };
 
@@ -50,7 +50,7 @@ const DoctorListPage = () => {
         setDoctors(response.data.result);
       }
     } catch (error) {
-      console.error('Error fetching doctors:', error);
+      console.log('Error fetching doctors:', error);
     }
   };
 
