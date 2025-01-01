@@ -3,7 +3,7 @@
     "newArchEnabled": true,
     "name": "Unime",
     "slug": "mobile-app",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/adaptive-icon.png",
     "userInterfaceStyle": "light",
@@ -27,7 +27,7 @@
       ],
       "softwareKeyboardLayoutMode": "pan",
       "allowBackup": true,
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/favicon.png"
