@@ -96,6 +96,8 @@ public class MailServiceImpl implements MailService {
         userService.saveNewPassword(user, newPasswork);
         return "New passwword: " +newPasswork;
     }
+
+
     public void sendCancelEmail(Appointment appointments) {
 
         String emailDoctor = appointments.getDoctorservice().getDoctor().getDoctorUserId().getEmail();

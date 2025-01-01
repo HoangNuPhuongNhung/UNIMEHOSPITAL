@@ -53,8 +53,8 @@ public class DoctorTimeworkServiceImpl implements DoctorTimeworkService {
     @Scheduled(cron = "0 0 * * * SUN")
 //    @Scheduled(fixedRate = 60000)
     public void checkAndAutoCreateDoctorTimework() {
-        int year = LocalDate.now().plusDays(7).getYear();
-        int week = LocalDate.now().plusDays(7).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int year = LocalDate.now().plusDays(14).getYear();
+        int week = LocalDate.now().plusDays(14).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
         log.info("week: {} ___year:  {}", week, year);
         List<Doctor> doctorsWithoutSchedule = getDoctorsWithoutSchedule(week, year);
         log.info("doctorsWithoutSchedule: "+ doctorsWithoutSchedule.size());

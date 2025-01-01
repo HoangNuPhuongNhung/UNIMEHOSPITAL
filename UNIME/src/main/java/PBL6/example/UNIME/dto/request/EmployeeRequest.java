@@ -39,9 +39,6 @@ public class EmployeeRequest {
     Boolean employeeGender;
 
     @NotNull(message = "MISSING_REQUIRED_FIELDS")
-    LocalDate employeeDateOfBirth;
-
-    @NotNull(message = "MISSING_REQUIRED_FIELDS")
     Integer departmentId;
 
 }

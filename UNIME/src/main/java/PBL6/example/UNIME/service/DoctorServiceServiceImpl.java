@@ -6,6 +6,7 @@ import PBL6.example.UNIME.dto.response.ServiceResponse;
 import PBL6.example.UNIME.entity.Appointment;
 import PBL6.example.UNIME.entity.Doctor;
 import PBL6.example.UNIME.entity.DoctorService;
+import PBL6.example.UNIME.enums.Status;
 import PBL6.example.UNIME.exception.AppException;
 import PBL6.example.UNIME.exception.ErrorCode;
 import PBL6.example.UNIME.repository.AppointmentRepository;
@@ -81,6 +82,7 @@ public class DoctorServiceServiceImpl implements DoctorServiceService {
         // Lấy danh sách Service từ danh sách DoctorService
         return doctorServices.stream()
                 .map(DoctorService::getDoctor)
+                .filter(d->d.getDoctorUserId().getStatus().equals(Status.ACTIVE.name()))
                 .map(this::mapToDoctorListResponse)
                 .collect(Collectors.toList());
     }
