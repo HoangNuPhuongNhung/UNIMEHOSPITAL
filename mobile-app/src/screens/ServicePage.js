@@ -17,6 +17,7 @@ const ServicePage = () => {
     const [search, setSearch] = useState('');
     const [services, setServices] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(5);
+    const [expandedCard, setExpandedCard] = useState(null);
     const navigation = useNavigation();
 
     // Fetch services
@@ -49,10 +50,6 @@ const ServicePage = () => {
             style={styles.background}
             resizeMode="cover"
         >
-            <ScrollView 
-                style={styles.container}
-                contentContainerStyle={styles.contentContainer}
-            >
                 <View style={styles.searchContainer}>
                     <TextInput
                         style={styles.searchInput}
@@ -69,31 +66,45 @@ const ServicePage = () => {
                     <Icon name="search" size={24} color="#333" style={styles.searchIcon} />
                 </View>
 
+                <ScrollView 
+                style={styles.container}
+                contentContainerStyle={styles.contentContainer}
+            >
                 {filteredServices.slice(0, currentIndex).map((service) => (
-                    <View key={service.serviceId} style={styles.card}>
-                        <Image source={{ uri: service.serviceImage }} style={styles.serviceImage} />
-                        <View style={styles.infoContainer}>
-                            <Text style={styles.serviceName}>{service.serviceName}</Text>
-                            <Text style={styles.serviceDescription}>{service.serviceDescription}</Text>
-                            <Text style={styles.price}>
-                                {Number(service.servicePrice).toLocaleString('vi-VN')} VNĐ
-                            </Text>
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => navigation.navigate('DoctorByServicePage', { service })}
+                    <TouchableOpacity 
+                        key={service.serviceId}
+                        onPress={() => setExpandedCard(expandedCard === service.serviceId ? null : service.serviceId)}
+                    >
+                        <View style={styles.card}>
+                            <Image source={{ uri: service.serviceImage }} style={styles.serviceImage} />
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.serviceName}>{service.serviceName}</Text>
+                                <Text 
+                                    style={styles.serviceDescription}
+                                    numberOfLines={expandedCard === service.serviceId ? null : 2}
                                 >
-                                    <Text style={styles.buttonText}>Xem danh sách Bác sĩ</Text>
-                                </TouchableOpacity>
-                                {/* <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => navigation.navigate('book service', { service })}
-                                >
-                                    <Text style={styles.buttonText}>Đặt dịch vụ</Text>
-                                </TouchableOpacity> */}
+                                    {service.serviceDescription}
+                                </Text>
+                                <Text style={styles.price}>
+                                    {Number(service.servicePrice).toLocaleString('vi-VN')} VNĐ
+                                </Text>
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity
+                                        style={styles.button}
+                                        onPress={() => navigation.navigate('DoctorByServicePage', { service })}
+                                    >
+                                        <Text style={styles.buttonText}>Xem danh sách Bác sĩ</Text>
+                                    </TouchableOpacity>
+                                    {/* <TouchableOpacity
+                                        style={styles.button}
+                                        onPress={() => navigation.navigate('book service', { service })}
+                                    >
+                                        <Text style={styles.buttonText}>Đặt dịch vụ</Text>
+                                    </TouchableOpacity> */}
+                                </View>
                             </View>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 ))}
 
                 {currentIndex < filteredServices.length && (
@@ -109,7 +120,7 @@ const ServicePage = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'rgba(244, 246, 252, 0.2)',
+        // backgroundColor: 'rgba(244, 246, 252, 0.2)',
     },
     contentContainer: {
         padding: 20,
@@ -122,8 +133,8 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
-        marginTop: 24
+        marginTop: 24,
+        padding: 20,
     },
     searchInput: {
         flex: 1,
@@ -142,10 +153,10 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         marginBottom: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.25,
+        // shadowRadius: 3.84,
         elevation: 5,
     },
     serviceImage: {
@@ -172,6 +183,7 @@ const styles = StyleSheet.create({
     serviceDescription: {
         fontSize: 14,
         color: '#777',
+        lineHeight: 20,
     },
     buttonContainer: {
         flexDirection: 'row',

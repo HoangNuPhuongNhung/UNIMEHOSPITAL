@@ -247,7 +247,7 @@ const AppointmentCard = ({ appointment,fetchAppointments  }) => {
       </View>
       <View style={styles.infoRow}>
         <Text>Dịch vụ: </Text>
-        <Text style={styles.value}>{appointment.serviceName}</Text>
+        <Text style={styles.serviceDescription} numberOfLines={2}>{appointment.serviceName}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>Bác sĩ:</Text>
@@ -542,6 +542,16 @@ datePickerText: {
     color: '#333',
     fontWeight: '500',
     marginRight: 10,
+  },
+  serviceDescription:
+  {
+    alignContent: 'right',
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+    marginRight: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
   },
   doctorName: {
     fontSize: 16,

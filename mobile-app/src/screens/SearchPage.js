@@ -21,7 +21,7 @@ const DoctorListPage = () => {
   const [selectedDepartment, setSelectedDepartment] = useState('Tất cả');
   const [departments, setDepartments] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-
+  const [noDoctorsMessage, setNoDoctorsMessage] = useState('');
   // Fetch departments
   const fetchDepartments = async () => {
     try {
@@ -39,18 +39,28 @@ const DoctorListPage = () => {
     try {
       let response;
       if (departmentId === 0) {
-        // Fetch all doctors
         response = await axios.get('https://api.unime.site/UNIME/doctors/get/doctorList');
       } else {
-        // Fetch doctors by department
-        response = await axios.get(`https://api.unime.site/UNIME/doctors/get/byDepartment?doctor_departmentId=${departmentId}`);
+        response = await axios.get(
+          `https://api.unime.site/UNIME/doctors/get/byDepartment?doctor_departmentId=${departmentId}`
+        );
       }
-      
+
       if (response.data.code === 1000) {
         setDoctors(response.data.result);
+        return response.data.result;
+      } else {
+        setDoctors([]);
+        throw new Error(response.data.message || "Unknown error");
       }
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setDoctors([]); // Clear the doctors list
+        return []; // Return empty list to indicate no results
+      }
       console.log('Error fetching doctors:', error);
+      setDoctors([]);
+      return [];
     }
   };
 
@@ -60,17 +70,23 @@ const DoctorListPage = () => {
   }, []);
 
   // Handle department selection
-  const handleDepartmentSelect = (department) => {
+  const handleDepartmentSelect = async (department) => {
     setSelectedDepartment(department.departmentName);
-    fetchDoctors(department.departmentId);
     setShowDropdown(false);
+
+    const doctorsByDepartment = await fetchDoctors(department.departmentId);
+    if (doctorsByDepartment && doctorsByDepartment.length === 0) {
+      setNoDoctorsMessage(`Không có bác sĩ nào thuộc chuyên khoa "${department.departmentName}".`);
+    } else {
+      setNoDoctorsMessage(''); // Clear message if doctors exist
+    }
   };
 
   const loadMoreDoctors = () => {
     setCurrentIndex((prevIndex) => prevIndex + 5);
   };
 
-  const filteredDoctors = doctors.filter((doctor) => 
+  const filteredDoctors = doctors.filter((doctor) =>
     doctor.doctorName.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -80,14 +96,11 @@ const DoctorListPage = () => {
       style={styles.background}
       resizeMode="cover"
     >
-      <ScrollView 
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-      >
+      <View style={styles.headerContainer}>
         <View style={styles.filterContainer}>
           <Text style={styles.label}>Chuyên khoa</Text>
           <View style={styles.dropdown}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setShowDropdown(!showDropdown)}
               style={styles.dropdownButton}
             >
@@ -95,7 +108,7 @@ const DoctorListPage = () => {
               <Icon name="arrow-drop-down" size={24} color="#333" />
             </TouchableOpacity>
             {showDropdown && (
-              <View style={styles.dropdownMenu}>
+              <ScrollView style={styles.dropdownMenu}>
                 {departments.map((dept) => (
                   <TouchableOpacity
                     key={dept.departmentId}
@@ -104,10 +117,11 @@ const DoctorListPage = () => {
                     <Text style={styles.dropdownItem}>{dept.departmentName}</Text>
                   </TouchableOpacity>
                 ))}
-              </View>
+              </ScrollView>
             )}
           </View>
         </View>
+
 
         <Text style={styles.label}>Tên bác sĩ</Text>
         <View style={styles.searchContainer}>
@@ -125,31 +139,41 @@ const DoctorListPage = () => {
           />
           <Icon name="search" size={24} color="#333" style={styles.searchIcon} />
         </View>
+      </View>
 
-        {filteredDoctors.slice(0, currentIndex).map((doctor) => (
-          <View key={doctor.doctorId} style={styles.card}>
-            <Image source={{ uri: doctor.doctorImage }} style={styles.doctorImage} />
-            <View style={styles.infoContainer}>
-              <Text style={styles.doctorName}>{doctor.doctorName}</Text>
-              <Text style={styles.hospital}>{doctor.doctorAddress}</Text>
-              <Text style={styles.departmentName}>Chuyên khoa: {doctor.departmentName}</Text>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => navigation.navigate('DoctorDetailPage', { doctor })}
-                >
-                  <Text style={styles.buttonText}>Xem chi tiết</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => navigation.navigate('book doctor', { doctor })}
-                >
-                  <Text style={styles.buttonText}>Đặt khám</Text>
-                </TouchableOpacity>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+      >
+        {noDoctorsMessage ? (
+          <Text style={styles.noDoctorsText}>{noDoctorsMessage}</Text>
+        ) : (
+          filteredDoctors.slice(0, currentIndex).map((doctor) => (
+            <View key={doctor.doctorId} style={styles.card}>
+              <Image source={{ uri: doctor.doctorImage }} style={styles.doctorImage} />
+              <View style={styles.infoContainer}>
+                <Text style={styles.doctorName}>{doctor.doctorName}</Text>
+                <Text style={styles.hospital}>Email: {doctor.doctorEmail}</Text>
+                <Text style={styles.hospital}>Ngày sinh: {doctor.doctorDateOfBirth}</Text>
+                <Text style={styles.departmentName}>Chuyên khoa: {doctor.departmentName}</Text>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('DoctorDetailPage', { doctor })}
+                  >
+                    <Text style={styles.buttonText}>Xem chi tiết</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('book doctor', { doctor })}
+                  >
+                    <Text style={styles.buttonText}>Đặt khám</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        ))}
+          ))
+        )}
 
         {currentIndex < filteredDoctors.length && (
           <TouchableOpacity style={styles.loadMoreButton} onPress={loadMoreDoctors}>
@@ -164,12 +188,17 @@ const DoctorListPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(244, 246, 252, 0.2)',
+
   },
   contentContainer: {
     padding: 20,
     paddingBottom: 150,
-    marginTop: 24
+  },
+  headerContainer: {
+    padding: 20,
+    marginTop: 24,
+    marginBottom: -25,
+
   },
   background: {
     flex: 1,
@@ -182,6 +211,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  noDoctorsText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#333',
+    marginVertical: 20,
+    fontWeight: 'bold',
   },
   dropdown: {
     flexDirection: 'row',
@@ -216,10 +252,10 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 3.84,
     elevation: 5,
   },
   doctorImage: {
@@ -285,7 +321,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     elevation: 5,
-    zIndex: 10,
+    zIndex: 100,
+    overflow: 'scroll',
+    maxHeight: 430,
   },
   dropdownItem: {
     padding: 10,

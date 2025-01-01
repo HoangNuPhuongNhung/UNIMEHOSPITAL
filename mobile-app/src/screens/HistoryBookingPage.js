@@ -82,7 +82,7 @@ const AppointmentCard = ({ appointment }) => {
       </View>
       <View style={styles.infoRow}>
         <Text>Dịch vụ: </Text>
-        <Text style={styles.value}>{appointment.serviceName}</Text>
+        <Text style={styles.serviceDescription}>{appointment.serviceName}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>Bác sĩ:</Text>
@@ -347,7 +347,16 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-
+  serviceDescription:
+  {
+    alignContent: 'right',
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+    marginRight: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
+  },
   datePickerButton: {
     backgroundColor: '#ffffff',
     paddingHorizontal: 16,

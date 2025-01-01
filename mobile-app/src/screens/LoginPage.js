@@ -4,11 +4,13 @@ import { AuthContext } from '../contexts/AuthContext'
 import {getUserInfo} from '../services/authService'
 import { UserContext } from '../contexts/UserContext';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/Ionicons';
 const LoginPage = ({ navigation }) => {
   const { login, loading } = useContext(AuthContext);
   const {userInfo, updateUserInfo} = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   // console.log({ login, loading }); 
 
   const validatePassword = (password) => {
@@ -104,14 +106,26 @@ const LoginPage = ({ navigation }) => {
           value={username}
           onChangeText={setUsername}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Mật khẩu"
-          secureTextEntry={true}
-          placeholderTextColor="#888"
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Mật khẩu"
+            secureTextEntry={!showPassword}
+            placeholderTextColor="#888"
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity 
+            style={styles.eyeIcon}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Icon 
+              name={showPassword ? 'eye-outline' : 'eye-off-outline'} 
+              size={24} 
+              color="#888"
+            />
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity style={styles.forgotPassword} onPress={() => navigation.navigate('ForgotPw')}>
           <Text style={styles.linkText}>Quên mật khẩu?</Text>
         </TouchableOpacity>
@@ -175,6 +189,28 @@ const styles = StyleSheet.create({
   },
   registerLink: {
     marginTop: 20,
+  },
+  passwordContainer: {
+    width: '80%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    marginBottom: 20,
+  },
+  passwordInput: {
+    flex: 1,
+    height: 50,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    backgroundColor: '#FFF',
+    color: '#000',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 20,
   },
 });
 

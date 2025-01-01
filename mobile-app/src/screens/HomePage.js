@@ -421,6 +421,8 @@ const styles = StyleSheet.create({
   place: {
     color: '#fff',
     fontSize: 14,
+    marginRight: 10,
+    paddingRight: 20,
   },
   dateContainer: {
     flexDirection: 'row',

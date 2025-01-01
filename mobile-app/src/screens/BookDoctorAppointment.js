@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
@@ -12,7 +12,7 @@ const BookDoctorAppointment = ({ route }) => {
   const { doctor, service = null } = route.params;
   // console.log(service);
   const navigation = useNavigation();
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString();
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedTime, setSelectedTime] = useState(null);
   const [serviceList, setServiceList] = useState([]);
@@ -60,38 +60,43 @@ const BookDoctorAppointment = ({ route }) => {
 
   useEffect(() => {
     if (selectedDate && doctorTimeWork.length > 0) {
-      // Tính toán weekOfYear và dayOfWeek của selectedDate
       const getWeekOfYear = (date) => {
         const tempDate = new Date(date);
         tempDate.setHours(0, 0, 0, 0);
-        tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7)); // Chuyển sang Thứ Năm
-        const week1 = new Date(tempDate.getFullYear(), 0, 4); // Tuần 1 bắt đầu từ 4/1
+        tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7));
+        const week1 = new Date(tempDate.getFullYear(), 0, 4);
         return 1 + Math.round(((tempDate - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
       };
-  
+
       const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
       const selectedDay = days[new Date(selectedDate).getDay()];
       const selectedWeek = getWeekOfYear(selectedDate);
       const selectedYear = new Date(selectedDate).getFullYear();
-  
-      // Lọc danh sách dựa vào năm, tuần, ngày và trạng thái
+
+      // Lấy giờ hiện tại
+      const now = new Date();
+      const currentTime = selectedDate === today ? now.getHours() * 60 + now.getMinutes() : -1;
+
+      // Lọc danh sách khung giờ
       const availableSlots = doctorTimeWork
         .filter(slot =>
-          slot.doctorTimeworkYear === selectedYear && 
-          slot.weekOfYear === selectedWeek && 
-          slot.dayOfWeek === selectedDay && 
-          slot.doctorTimeworkStatus === "Available" 
+          slot.doctorTimeworkYear === selectedYear &&
+          slot.weekOfYear === selectedWeek &&
+          slot.dayOfWeek === selectedDay &&
+          slot.doctorTimeworkStatus === "Available" &&
+          // Nếu là ngày hiện tại, chỉ lấy các slot sau giờ hiện tại
+          (currentTime === -1 || Number(slot.startTime.split(":")[0]) * 60 + Number(slot.startTime.split(":")[1]) >= currentTime)
         )
         .map(slot => ({
           id: slot.doctorTimeworkId,
           time: `${slot.startTime.slice(0, 5)} - ${slot.endTime.slice(0, 5)}` // Định dạng thời gian
         }));
-  
-      setTimeSlots(availableSlots); // Cập nhật các khung giờ hợp lệ
+
+      setTimeSlots(availableSlots);
       setSelectedTime(null); // Reset lựa chọn thời gian
     }
   }, [selectedDate, doctorTimeWork]);
-  
+
   useEffect(() => {
     if (doctor?.doctorId) {
       axios
@@ -114,9 +119,10 @@ const BookDoctorAppointment = ({ route }) => {
           text: "Hủy",
           style: "cancel"
         },
-        { text: "Đồng ý", onPress: () => {
+        {
+          text: "Đồng ý", onPress: () => {
             logout();
-            navigation.replace("Login"); 
+            navigation.replace("Login");
           }
         }
       ],
@@ -141,9 +147,9 @@ const BookDoctorAppointment = ({ route }) => {
   const confirmAppointment = async () => {
     try {
       setIsLoading(true);
-  
+
       const selectedTimeSlot = timeSlots.find(slot => slot.time === selectedTime);
-  
+
       if (!selectedTimeSlot || !selectedService) {
         Toast.show({
           type: 'warning',
@@ -154,10 +160,10 @@ const BookDoctorAppointment = ({ route }) => {
         });
         return;
       }
-  
+
       const tokenString = await AsyncStorage.getItem('userToken');
       let token = tokenString ? JSON.parse(tokenString) : null;
-  
+
       if (!token || !token.raw) {
         console.log("Token không tồn tại");
         Toast.show({
@@ -169,9 +175,9 @@ const BookDoctorAppointment = ({ route }) => {
         });
         return;
       }
-  
+
       const checkToken = await checkValidToken(token.raw);
-  
+
       if (checkToken) {
         console.log('Token còn hạn!');
         try {
@@ -179,7 +185,8 @@ const BookDoctorAppointment = ({ route }) => {
             'https://api.unime.site/UNIME/appointments',
             {
               doctortimeworkId: selectedTimeSlot.id,
-              doctorserviceId: selectedService.serviceId,
+              doctorId: doctor.doctorId,
+              serviceId: selectedService.serviceId,
             },
             {
               headers: {
@@ -188,7 +195,6 @@ const BookDoctorAppointment = ({ route }) => {
               },
             }
           );
-  
           if (response.data.code === 1000) {
             navigation.navigate('appointment success', {
               doctorDetails,
@@ -234,7 +240,7 @@ const BookDoctorAppointment = ({ route }) => {
                 },
               }
             );
-  
+
             if (response.data.code === 1000) {
               navigation.navigate('appointment success', {
                 doctorDetails,
@@ -278,7 +284,7 @@ const BookDoctorAppointment = ({ route }) => {
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   if (loading) {
     return <View style={styles.container}><Text>Loading...</Text></View>;
@@ -316,21 +322,29 @@ const BookDoctorAppointment = ({ route }) => {
 
       <Text style={styles.sectionTitle}>Chọn giờ khám</Text>
       <View style={styles.timeSlotsContainer}>
-        {timeSlots.map((slot) => (
-          <TouchableOpacity
-            key={slot.id}
-            style={[
-              styles.timeSlot,
-              selectedTime === slot.time && styles.selectedTimeSlot
-            ]}
-            onPress={() => setSelectedTime(slot.time)}
-          >
-            <Text style={[
-              styles.timeText,
-              selectedTime === slot.time && styles.selectedTimeText
-            ]}>{slot.time}</Text>
-          </TouchableOpacity>
-        ))}
+        {timeSlots.length > 0 ? (
+          timeSlots.map((slot) => (
+            <TouchableOpacity
+              key={slot.id}
+              style={[
+                styles.timeSlot,
+                selectedTime === slot.time && styles.selectedTimeSlot
+              ]}
+              onPress={() => setSelectedTime(slot.time)}
+            >
+              <Text
+                style={[
+                  styles.timeText,
+                  selectedTime === slot.time && styles.selectedTimeText
+                ]}
+              >
+                {slot.time}
+              </Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text style={styles.noSlotsMessage}>Không có lịch trống !</Text> // Thông báo khi không có slot thời gian
+        )}
       </View>
       <Text style={styles.sectionTitle}>Chọn dịch vụ</Text>
       <Picker
@@ -354,10 +368,10 @@ const BookDoctorAppointment = ({ route }) => {
         enabled={!service}
       >
         {filteredServices.map(srv => (
-          <Picker.Item 
-            key={srv.serviceId} 
-            label={`${srv.serviceName}`} 
-            value={Number(srv.serviceId)} 
+          <Picker.Item
+            key={srv.serviceId}
+            label={`${srv.serviceName}`}
+            value={Number(srv.serviceId)}
           />
         ))}
       </Picker>
@@ -413,6 +427,12 @@ const styles = StyleSheet.create({
     color: '#666',
     marginVertical: 8,
   },
+  noSlotsMessage: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#4D9DE0'
+  },
   address: {
     fontSize: 16,
     textAlign: 'center',
@@ -462,8 +482,8 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     backgroundColor: '#f5f5f5',
     borderColor: '#ccc',
-    borderStyle: 'dashed', 
-    color: '#666',          
+    borderStyle: 'dashed',
+    color: '#666',
   },
   priceLabel: {
     fontSize: 18,

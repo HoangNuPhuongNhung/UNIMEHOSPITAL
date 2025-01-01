@@ -66,6 +66,7 @@ export const login = async (username, password) => {
 export const logout = async () => {
   try {
     const token = await getToken(); 
+    console.log(token.raw);
     if (token && token.raw) {
       await axios.post('https://api.unime.site/UNIME/auth/logout', {
         token: token.raw
@@ -90,19 +91,19 @@ export const getToken = async () => {
 
 export const getUserInfo = async () => {
   try {
-    const token = await getToken(); // Lấy token từ AsyncStorage
+    const token = await getToken(); 
     if (!token || !token.raw) {
       throw new Error('Không tìm thấy token.');
     }
 
     const response = await axios.get('https://api.unime.site/UNIME/patients/myInfo', {
       headers: {
-        Authorization: `Bearer ${token.raw}`, // Sử dụng Bearer Token
+        Authorization: `Bearer ${token.raw}`,
       },
     });
 
     if (response.status === 200 && response.data.code === 1000) {
-      return response.data.result; // Trả về phần `result` của response
+      return response.data.result;
     } else {
       throw new Error('Không thể lấy thông tin user.');
     }

@@ -4,9 +4,10 @@ import axios from 'axios';
 import RadioGroup from 'react-native-radio-buttons-group';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
+import Ionicons from '@expo/vector-icons/Ionicons';
 const CreatePasswordPage = ({ route, navigation }) => {
   const email = route.params?.email || '';
-  console.log(email);
+  // console.log(email);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,8 +19,9 @@ const CreatePasswordPage = ({ route, navigation }) => {
   const [selectedId, setSelectedId] = useState('1');
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  console.log(gender);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // console.log(gender);
 
   // useEffect(() => {
   //   if (!email) {
@@ -30,8 +32,8 @@ const CreatePasswordPage = ({ route, navigation }) => {
   // }, [email]);
 
   const validatePassword = (password) => {
-    if (password.length < 6) {
-      return 'Mật khẩu phải chứa ít nhất 6 ký tự.';
+    if (password.length < 8) {
+      return 'Mật khẩu phải chứa ít nhất 8 ký tự.';
     }
     return null;
   };
@@ -238,22 +240,46 @@ const CreatePasswordPage = ({ route, navigation }) => {
             {dateOfBirth || 'Chọn ngày sinh'}
           </Text>
         </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập mật khẩu"
-          secureTextEntry
-          placeholderTextColor="#888"
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập lại mật khẩu"
-          secureTextEntry
-          placeholderTextColor="#888"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputWithIcon}
+            placeholder="Nhập mật khẩu"
+            placeholderTextColor="#888"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity 
+            style={styles.eyeIcon} 
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Ionicons 
+              name={showPassword ? "eye-outline" : "eye-off-outline"} 
+              size={24} 
+              color="#888"
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputWithIcon}
+            placeholder="Nhập lại mật khẩu"
+            placeholderTextColor="#888"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+          />
+          <TouchableOpacity 
+            style={styles.eyeIcon} 
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <Ionicons 
+              name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
+              size={24} 
+              color="#888"
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.radioContainer}>
           <Text style={styles.label}>Giới tính:</Text>
           <RadioGroup
@@ -345,6 +371,29 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     color: '#888',
+  },
+  inputContainer: {
+    width: '80%',
+    position: 'relative',
+    marginBottom: 20,
+  },
+  inputWithIcon: {
+    width: '100%',
+    height: 50,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    backgroundColor: '#FFF',
+    color: '#000',
+    paddingRight: 50,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 15,
+    top: 12,
+    padding: 5,
   },
 });
 

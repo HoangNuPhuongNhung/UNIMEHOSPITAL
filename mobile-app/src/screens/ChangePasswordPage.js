@@ -55,11 +55,11 @@ export default function ChangePasswordScreen() {
       return;
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Mật khẩu mới phải có ít nhất 6 ký tự!',
+        text2: 'Mật khẩu mới phải có ít nhất 8 ký tự!',
         visibilityTime: 2000,
         autoHide: true,
       });
@@ -195,9 +195,17 @@ export default function ChangePasswordScreen() {
             secureTextEntry={!showCurrentPassword}
             value={currentPassword}
             onChangeText={setCurrentPassword}
+            placeholder="Nhập mật khẩu hiện tại"
           />
-          <TouchableOpacity onPress={() => setShowCurrentPassword(!showCurrentPassword)}>
-            <Ionicons name={showCurrentPassword ? "eye" : "eye-off"} size={24} color="black" />
+          <TouchableOpacity 
+            style={styles.eyeIcon} 
+            onPress={() => setShowCurrentPassword(!showCurrentPassword)}
+          >
+            <Ionicons 
+              name={showCurrentPassword ? "eye-outline" : "eye-off-outline"} 
+              size={24} 
+              color="#888" 
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -210,9 +218,17 @@ export default function ChangePasswordScreen() {
             secureTextEntry={!showNewPassword}
             value={newPassword}
             onChangeText={setNewPassword}
+            placeholder="Nhập mật khẩu mới"
           />
-          <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)}>
-            <Ionicons name={showNewPassword ? "eye" : "eye-off"} size={24} color="black" />
+          <TouchableOpacity 
+            style={styles.eyeIcon} 
+            onPress={() => setShowNewPassword(!showNewPassword)}
+          >
+            <Ionicons 
+              name={showNewPassword ? "eye-outline" : "eye-off-outline"} 
+              size={24} 
+              color="#888" 
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -225,9 +241,17 @@ export default function ChangePasswordScreen() {
             secureTextEntry={!showConfirmPassword}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            placeholder="Nhập lại mật khẩu mới"
           />
-          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-            <Ionicons name={showConfirmPassword ? "eye" : "eye-off"} size={24} color="black" />
+          <TouchableOpacity 
+            style={styles.eyeIcon} 
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <Ionicons 
+              name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
+              size={24} 
+              color="#888" 
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -266,8 +290,8 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 5,
     backgroundColor: '#fff',
+    position: 'relative',
   },
   input: {
     flex: 1,
@@ -284,5 +308,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  eyeIcon: {
+    padding: 10,
   },
 });
