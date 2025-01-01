@@ -68,9 +68,7 @@ export const logout = async () => {
     const token = await getToken(); 
     if (token && token.raw) {
       await axios.post('https://api.unime.site/UNIME/auth/logout', {}, {
-        headers: {
-          Authorization: `Bearer ${token.raw}`,
-        },
+        token: token.raw
       });
     }
     
