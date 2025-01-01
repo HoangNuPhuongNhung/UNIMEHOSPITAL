@@ -65,8 +65,19 @@ export const login = async (username, password) => {
 
 export const logout = async () => {
   try {
+    const token = await getToken(); 
+    if (token && token.raw) {
+      await axios.post('https://api.unime.site/UNIME/auth/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${token.raw}`,
+        },
+      });
+    }
+    
+    // Xóa dữ liệu local
     await AsyncStorage.removeItem('userToken');
-    await AsyncStorage.removeItem('userInfo'); // Xóa thông tin người dùng
+    await AsyncStorage.removeItem('userInfo');
+    
   } catch (error) {
     console.log('Lỗi đăng xuất:', error.message);
   }
